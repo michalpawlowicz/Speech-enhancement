@@ -4,3 +4,6 @@ env/
 data/
 demo_data/*
 *.pyc
+logs/
+weights/
+tensorboard.logs

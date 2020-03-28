@@ -6,6 +6,9 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 import tensorflow as tf
 from model_unet import unet
 from data_tools import scaled_in, scaled_ou
+import os
+import time
+import datetime
 
 def training(path_save_spectrogram, weights_path, name_model, training_from_scratch, epochs, batch_size):
     """ This function will read noisy voice and clean voice spectrograms created by data_creation mode,
@@ -49,29 +52,20 @@ def training(path_save_spectrogram, weights_path, name_model, training_from_scra
 
     #If training from scratch
     if training_from_scratch:
-
         generator_nn=unet()
     #If training from pre-trained weights
     else:
-
         generator_nn=unet(pretrained_weights = weights_path+name_model+'.h5')
 
 
     #Save best models to disk during training
-    checkpoint = ModelCheckpoint(weights_path+'/model_best.h5', verbose=1, monitor='val_loss',save_best_only=True, mode='auto')
+    # checkpoint_name = "cp-{epoch:04d}.h5"
+    # checkpoint_path = os.path.join(weights_path, checkpoint_name)
+    # checkpoint = ModelCheckpoint(checkpoint_path, verbose=1, monitor='val_loss',save_best_only=True, mode='auto', period=1)
 
-    generator_nn.summary()
+    #log_dir = "logs/model-{}".format(int(time.time()))
+    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
+
     #Training
-    history = generator_nn.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, shuffle=True, callbacks=[checkpoint], verbose=1, validation_data=(X_test, y_test))
-
-    #Plot training and validation loss (log scale)
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-    epochs = range(1, len(loss) + 1)
-
-    plt.plot(epochs, loss, label='Training loss')
-    plt.plot(epochs, val_loss, label='Validation loss')
-    plt.yscale('log')
-    plt.title('Training and validation loss')
-    plt.legend()
-    plt.show()
+    generator_nn.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, shuffle=True, callbacks=[tensorboard_callback], verbose=1, validation_data=(X_test, y_test))
