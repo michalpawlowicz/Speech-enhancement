@@ -4,7 +4,6 @@ from tensorflow.keras.layers import Input, Conv2D, LeakyReLU, MaxPooling2D, Drop
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import backend
 import tensorflow as tf
-print(tf.__version__)
 
 #Unet network
 def unet(pretrained_weights = None,input_size = (128,128,1)):
