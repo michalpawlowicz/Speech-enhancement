@@ -21,7 +21,7 @@ parser.add_argument('--training_from_scratch',default=True, type=bool)
 #folder of saved weights
 parser.add_argument('--weights_folder', default='./weights', type=str)
 #Nb of epochs for training
-parser.add_argument('--epochs', default=10, type=int)
+parser.add_argument('--epochs', default=100, type=int)
 #Batch size for training
 parser.add_argument('--batch_size', default=64, type=int)
 #Name of saved model to read

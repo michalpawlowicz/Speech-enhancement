@@ -58,14 +58,14 @@ def training(path_save_spectrogram, weights_path, name_model, training_from_scra
     else:
         generator_nn = unet(pretrained_weights=weights_path+name_model+'.h5')
     # Save best models to disk during training
-    # checkpoint_name = "cp-{epoch:04d}.h5"
-    # checkpoint_path = os.path.join(weights_path, checkpoint_name)
-    # checkpoint = ModelCheckpoint(checkpoint_path, verbose=1, monitor='val_loss',save_best_only=True, mode='auto', period=1)
+    checkpoint_name = "cp-{epoch:04d}.h5"
+    checkpoint_path = os.path.join(weights_path, checkpoint_name)
+    checkpoint = ModelCheckpoint(
+        checkpoint_path, verbose=1, monitor='val_loss', save_best_only=True, mode='auto', period=1)
 
     #log_dir = "logs/model-{}".format(int(time.time()))
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, update_freq='epoch', write_graph=True, profile_batch=0)
 
     # Training
-    generator_nn.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, shuffle=True, callbacks=[
-                     tensorboard_callback], verbose=1, validation_data=(X_test, y_test))
+    generator_nn.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, shuffle=True, callbacks=[tensorboard_callback], verbose=1, validation_data=(X_test, y_test))
