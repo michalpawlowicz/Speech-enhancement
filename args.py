@@ -15,7 +15,7 @@ parser.add_argument('--path_save_time_serie', default='/home/michal/Documents/Sp
 
 parser.add_argument('--path_save_sound', default='/home/michal/Documents/Speech-enhancement/data/Train/sound/', type=str)
 #How much frame to create in data_creation mode
-parser.add_argument('--nb_samples', default=500, type=int)
+parser.add_argument('--nb_samples', default=10000, type=int)
 #Training from scratch or pre-trained weights
 parser.add_argument('--training_from_scratch',default=True, type=bool)
 #folder of saved weights

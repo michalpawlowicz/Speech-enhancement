@@ -37,6 +37,23 @@ min_duration, frame_length, hop_length_frame, hop_length_frame_noise, nb_samples
     voice = audio_files_to_numpy(voice_dir, list_voice_files,
                                      sample_rate, frame_length, hop_length_frame, min_duration)
 
+    """
+    nose nad voice -> shape (number of frames of all files, frame_lenght)
+    raw data from librosa
+    ---------------------
+    | frame 1 of file 1 |
+    | frame 2 of file 1 |
+    |         .         |
+    |         .         |
+    |         .         |
+    | frame n of file 1 |
+    |         .         |
+    |         .         |
+    |         .         |
+    | frame n of file m |
+    ---------------------
+    """
+
     # Blend some clean voices with random selected noises (and a random level of noise)
     prod_voice, prod_noise, prod_noisy_voice = blend_noise_randomly(
             voice, noise, nb_samples, frame_length)

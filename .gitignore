@@ -7,3 +7,5 @@ demo_data/*
 logs/
 weights/
 tensorboard.logs
+OpenSLR/*
+*DS_Store*

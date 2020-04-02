@@ -9,8 +9,8 @@ def audio_to_audio_frame_stack(sound_data, frame_length, hop_length_frame):
 
     sequence_sample_length = sound_data.shape[0]
 
-    sound_data_list = [sound_data[start:start + frame_length] for start in range(
-    0, sequence_sample_length - frame_length + 1, hop_length_frame)]  # get sliding windows
+    sound_data_list = [sound_data[start:start + frame_length] for start in range(0, sequence_sample_length - frame_length + 1, hop_length_frame)]  # get sliding windows
+
     sound_data_array = np.vstack(sound_data_list)
 
     return sound_data_array
