@@ -1,4 +1,4 @@
-from SpectogramGenerator import SpectogramGenerator
+from generators.SpectogramGenerator import SpectogramGenerator
 import keras
 import numpy as np
 

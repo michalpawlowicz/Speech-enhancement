@@ -1,4 +1,4 @@
-from utils import read_sample
+from generators.preprocess.Utils import read_sample
 
 
 class AudioFramesGenerator():

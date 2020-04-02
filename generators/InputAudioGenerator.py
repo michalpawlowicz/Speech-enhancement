@@ -1,4 +1,4 @@
-from AudioGenerator import AudioGenerator
+from generators.AudioGenerator import AudioGenerator
 
 
 class InputAudioGererator():

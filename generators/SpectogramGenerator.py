@@ -1,7 +1,7 @@
 import librosa
 import numpy as np
 from typing import Tuple
-from InputAudioGenerator import InputAudioGererator
+from generators.InputAudioGenerator import InputAudioGererator
 
 
 class SpectogramGenerator():

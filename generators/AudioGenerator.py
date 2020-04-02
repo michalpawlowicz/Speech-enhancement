@@ -1,4 +1,4 @@
-from AudioFramesGenerator import AudioFramesGenerator
+from generators.AudioFramesGenerator import AudioFramesGenerator
 
 class AudioGenerator():
     def __init__(self, samples: list, sampling: int, frame_lenght: int, hop: int):
