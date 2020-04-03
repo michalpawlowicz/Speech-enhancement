@@ -1,15 +1,16 @@
 from generators.SpectogramGenerator import SpectogramGenerator
-import keras
+from tensorflow.python.keras.utils.data_utils import Sequence
 import numpy as np
+from typing import Tuple
 
 
-class Generator(keras.utils.Sequence):
+class Generator(Sequence):
     """[summary]
     """
 
     def __init__(self, batch_size: int, samples_nb: int, generator: SpectogramGenerator):
         """[summary]
-        
+
         Arguments:
             keras {[type]} -- [description]
             batch_size {int} -- [description]
@@ -26,7 +27,14 @@ class Generator(keras.utils.Sequence):
 
     def __getitem__(self, index):
         try:
-            x, y = itertools.islice(array, self.batch_size)
-            return x, y
+            X = np.zeros((self.batch_size, self.generator.shape()[0]))
+            Y = np.zeros((self.batch_size, self.generator.shape()[0]))
+            for i in range(self.batch_size):
+                x, y = next(self.generator)
+                X[i, :] = x
+                y[i, :] = y
+            X = X.reshape(X.shape[0], X.shape[1], X.shape[2], 1)
+            Y = Y.reshape(Y.shape[0], Y.shape[1], Y.shape[2], 1)
+            return X, Y
         except:
-            return [], []
+            return np.array([]), np.array([])

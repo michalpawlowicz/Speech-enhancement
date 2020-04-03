@@ -1,10 +1,23 @@
 import random
 import os
+import librosa
+import numpy as np
 from progress.bar import Bar
 from typing import List
 from utils import read_files
 
-def create(noise_dir : str, speech_dir : str, out_dir : str, frame_lenght : int, hop : int, sampling : int) -> None:
+
+def create(noise_dir: str, speech_dir: str, out_dir: str, frame_lenght: int, hop: int, sampling: int) -> None:
+    """[summary]
+    
+    Arguments:
+        noise_dir {str} -- [description]
+        speech_dir {str} -- [description]
+        out_dir {str} -- [description]
+        frame_lenght {int} -- [description]
+        hop {int} -- [description]
+        sampling {int} -- [description]
+    """
     print("-> Reading noise files")
     noice_files = [os.path.join(noise_dir, f)
                    for f in os.scandir(noise_dir)][:10]

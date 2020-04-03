@@ -15,6 +15,14 @@ class SpectogramGenerator():
         self.generator = generator
         self.n_fft = n_fft
 
+    def shape(self) -> Tuple[int, int]:
+        """[summary]
+        
+        Returns:
+            Tuple[int, int] -- [description]
+        """
+        return self.generator.shape()
+
     def __iter__(self):
         return self
 
@@ -24,6 +32,7 @@ class SpectogramGenerator():
         Returns:
             Tuple[list, list] -- [description]
         """
+
         x, y = next(self.generator)
         x_stftaudio = librosa.stft(x, n_fft=self.n_fft)
         x_magnitude, _ = librosa.magphase(x_stftaudio)

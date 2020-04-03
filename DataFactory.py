@@ -1,3 +1,4 @@
+from model_unet import unet
 import os
 import librosa
 import itertools
@@ -15,7 +16,6 @@ from generators.AudioGenerator import AudioGenerator
 from generators.InputAudioGenerator import InputAudioGererator
 from generators.SpectogramGenerator import SpectogramGenerator
 from generators.KerasSpectogramGenerator import Generator
-
 
 
 if "TRAIN_CLEAN" not in os.environ:
@@ -58,16 +58,12 @@ frame_lenght = int(os.environ["FRAME_LENGHT"])
 # os.environ["FRAME_LENGHT"]), hop=int(os.environ["HOP"]), sampling=int(os.environ["SAMPLING"]))
 
 
-
-
-
 # samples_count = count_samples(os.scandir(os.environ["TRAIN_NOISY"]), sampling, frame_lenght, hop)
 noisy_files = [d.path for d in os.scandir(os.environ["TRAIN_NOISY"])][:10]
 sorted(noisy_files)
 clean_files = [d.path for d in os.scandir(os.environ["TRAIN_NOISY"])][:10]
 sorted(clean_files)
 
-print(noisy_files)
 samples_nb = count_samples(noisy_files, sampling, frame_lenght, hop)
 print("Number of samples: ", samples_nb)
 
@@ -78,10 +74,22 @@ for x, y in zip(noisy_files, clean_files):
     if x != y:
         raise RuntimeError("Samples are different!")
 
-noisy_audio_generator = AudioGenerator(noisy_files, sampling, frame_lenght, hop)
-clean_audio_generator = AudioGenerator(clean_files, sampling, frame_lenght, hop)
-input_audio_generatpr = InputAudioGererator(noisy_audio_generator, clean_audio_generator)
+noisy_audio_generator = AudioGenerator(
+    noisy_files, sampling, frame_lenght, hop)
+clean_audio_generator = AudioGenerator(
+    clean_files, sampling, frame_lenght, hop)
+input_audio_generatpr = InputAudioGererator(
+    noisy_audio_generator, clean_audio_generator)
 spectogram_generator = SpectogramGenerator(input_audio_generatpr, 512)
 
 generator = Generator(64, samples_nb, spectogram_generator)
 
+X, y = generator.__getitem__(0)
+# print(generator.shape())
+# print(X.shape)
+# print(y.shape)
+
+
+model = unet()
+model.fit_generator(generator, steps_per_epoch=None, epochs=1, verbose=1, callbacks=None, validation_data=None,
+                    validation_steps=None, validation_freq=1, workers=1, use_multiprocessing=False, shuffle=False, initial_epoch=0)

@@ -1,4 +1,5 @@
 from generators.preprocess.Utils import read_sample
+from typing import Tuple
 
 
 class AudioFramesGenerator():
