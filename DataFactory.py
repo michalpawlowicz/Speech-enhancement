@@ -83,6 +83,6 @@ spectogram_generator = SpectogramGenerator(input_audio_generatpr, 512)
 
 generator = Generator(64, samples_nb, spectogram_generator)
 
-model = unet()
+model = unet(input_size=generator.input_shape)
 model.fit_generator(generator, steps_per_epoch=None, epochs=1, verbose=1, callbacks=None, validation_data=None,
                     validation_steps=None, validation_freq=1, workers=5, use_multiprocessing=False, shuffle=False, initial_epoch=0)

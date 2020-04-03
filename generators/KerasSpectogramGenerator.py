@@ -21,6 +21,7 @@ class Generator(Sequence):
         self.samples_nb = samples_nb
         self.batch_nb = 0
         self.generator = generator
+        self.input_shape = (generator.shape()[0], generator.shape()[1], 1)
 
     def __len__(self):
         return int(np.ceil(self.samples_nb / float(self.batch_size)))
@@ -29,17 +30,17 @@ class Generator(Sequence):
         print("Batch: {0} / {1}".format(index, self.__len__()))
         try:
             sx, sy = self.generator.shape()
-            X = np.zeros((self.batch_size, 257, 126))
-            Y = np.zeros((self.batch_size, 257, 126))
+            X = np.zeros((self.batch_size, self.input_shape[0], self.input_shape[1]))
+            Y = np.zeros((self.batch_size, self.input_shape[0], self.input_shape[1]))
             print("------------->", X.shape)
             for i in range(self.batch_size):
                 x, y = next(self.generator)
                 X[i, :, :] = x
-                y[i, :, :] = y
+                Y[i, :, :] = y
             X = X[:, :, :]
-            X = X.reshape(X.shape[0], X.shape[1], X.shape[2], 1)
+            X = X.reshape(self.batch_size, self.input_shape[0], self.input_shape[1], self.input_shape[2])
             Y = Y[:, :, :]
-            Y = Y.reshape(Y.shape[0], Y.shape[1], Y.shape[2], 1)
+            Y = Y.reshape(self.batch_size, self.input_shape[0], self.input_shape[1], self.input_shape[2])
             return X, Y
         except StopIteration:
             raise RuntimeError("Batch index out of range: {0}".format(index))

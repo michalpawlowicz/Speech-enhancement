@@ -16,7 +16,8 @@ class SpectogramGenerator():
         self.n_fft = n_fft
 
     def shape(self):
-        return int(1+self.n_fft/2), 0
+        #return int(1+self.n_fft/2), 0
+        return 256, 126
 
     def __iter__(self):
         return self
