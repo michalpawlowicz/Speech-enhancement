@@ -4,7 +4,7 @@ import librosa
 import numpy as np
 from progress.bar import Bar
 from typing import List
-from utils import read_files
+from generators.preprocess.Utils import read_files
 
 
 def create(noise_dir: str, speech_dir: str, out_dir: str, frame_lenght: int, hop: int, sampling: int) -> None:
@@ -24,7 +24,7 @@ def create(noise_dir: str, speech_dir: str, out_dir: str, frame_lenght: int, hop
 
     print("-> Reading speech files")
     speech_files = [os.path.join(speech_dir, f)
-                    for f in os.scandir(speech_dir)][:10]
+                    for f in os.scandir(speech_dir)]
 
     print("-> Shuffling noise files")
     random.shuffle(noice_files)

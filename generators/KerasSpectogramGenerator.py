@@ -26,15 +26,20 @@ class Generator(Sequence):
         return int(np.ceil(self.samples_nb / float(self.batch_size)))
 
     def __getitem__(self, index):
+        print("Batch: {0} / {1}".format(index, self.__len__()))
         try:
-            X = np.zeros((self.batch_size, self.generator.shape()[0]))
-            Y = np.zeros((self.batch_size, self.generator.shape()[0]))
+            sx, sy = self.generator.shape()
+            X = np.zeros((self.batch_size, 257, 126))
+            Y = np.zeros((self.batch_size, 257, 126))
+            print("------------->", X.shape)
             for i in range(self.batch_size):
                 x, y = next(self.generator)
-                X[i, :] = x
-                y[i, :] = y
+                X[i, :, :] = x
+                y[i, :, :] = y
+            X = X[:, :, :]
             X = X.reshape(X.shape[0], X.shape[1], X.shape[2], 1)
+            Y = Y[:, :, :]
             Y = Y.reshape(Y.shape[0], Y.shape[1], Y.shape[2], 1)
             return X, Y
-        except:
-            return np.array([]), np.array([])
+        except StopIteration:
+            raise RuntimeError("Batch index out of range: {0}".format(index))

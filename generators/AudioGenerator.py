@@ -24,18 +24,6 @@ class AudioGenerator():
         self.curr = AudioFramesGenerator(
             self.samples[0], sampling, frame_lenght, hop)
 
-    def shape(self) -> (int, int):
-        """[summary]
-        
-        Arguments:
-            self {[type]} -- [description]
-            int {[type]} -- [description]
-        
-        Returns:
-            [type] -- [description]
-        """
-        return (self.frame_lenght, 1)
-
     def __next__(self):
         try:
             return next(self.curr)

@@ -15,13 +15,8 @@ class SpectogramGenerator():
         self.generator = generator
         self.n_fft = n_fft
 
-    def shape(self) -> Tuple[int, int]:
-        """[summary]
-        
-        Returns:
-            Tuple[int, int] -- [description]
-        """
-        return self.generator.shape()
+    def shape(self):
+        return int(1+self.n_fft/2), 0
 
     def __iter__(self):
         return self

@@ -16,6 +16,7 @@ from generators.AudioGenerator import AudioGenerator
 from generators.InputAudioGenerator import InputAudioGererator
 from generators.SpectogramGenerator import SpectogramGenerator
 from generators.KerasSpectogramGenerator import Generator
+from generators.preprocess.Preprocess import create
 
 
 if "TRAIN_CLEAN" not in os.environ:
@@ -54,25 +55,23 @@ sampling = int(os.environ["SAMPLING"])
 hop = int(os.environ["HOP"])
 frame_lenght = int(os.environ["FRAME_LENGHT"])
 
-# create(noise_dir=os.environ["TRAIN_NOISE"], speech_dir=os.environ["TRAIN_CLEAN"], out_dir=os.environ["TRAIN_NOISY"], frame_lenght=int(
-# os.environ["FRAME_LENGHT"]), hop=int(os.environ["HOP"]), sampling=int(os.environ["SAMPLING"]))
+create(noise_dir=os.environ["TRAIN_NOISE"], speech_dir=os.environ["TRAIN_CLEAN"], out_dir=os.environ["TRAIN_NOISY"], frame_lenght=int(
+    os.environ["FRAME_LENGHT"]), hop=int(os.environ["HOP"]), sampling=int(os.environ["SAMPLING"]))
 
-
-# samples_count = count_samples(os.scandir(os.environ["TRAIN_NOISY"]), sampling, frame_lenght, hop)
-noisy_files = [d.path for d in os.scandir(os.environ["TRAIN_NOISY"])][:10]
+noisy_files = [d.path for d in os.scandir(os.environ["TRAIN_NOISY"])]
 sorted(noisy_files)
-clean_files = [d.path for d in os.scandir(os.environ["TRAIN_NOISY"])][:10]
+clean_files = [d.path for d in os.scandir(os.environ["TRAIN_CLEAN"])]
 sorted(clean_files)
+
+if len(noisy_files) != len(clean_files):
+    raise RuntimeError("Number of clean samples and noisy samples is different {0} vs. {1}".format(len(noisy_files), len(clean_files)))
+
+for x, y in zip(noisy_files, clean_files):
+    if os.path.basename(x) != os.path.basename(y):
+        raise RuntimeError("Samples are different! {0} vs {1}".format(x, y))
 
 samples_nb = count_samples(noisy_files, sampling, frame_lenght, hop)
 print("Number of samples: ", samples_nb)
-
-if len(noisy_files) != len(clean_files):
-    raise RuntimeError("Should be equal")
-
-for x, y in zip(noisy_files, clean_files):
-    if x != y:
-        raise RuntimeError("Samples are different!")
 
 noisy_audio_generator = AudioGenerator(
     noisy_files, sampling, frame_lenght, hop)
@@ -84,12 +83,6 @@ spectogram_generator = SpectogramGenerator(input_audio_generatpr, 512)
 
 generator = Generator(64, samples_nb, spectogram_generator)
 
-X, y = generator.__getitem__(0)
-# print(generator.shape())
-# print(X.shape)
-# print(y.shape)
-
-
 model = unet()
 model.fit_generator(generator, steps_per_epoch=None, epochs=1, verbose=1, callbacks=None, validation_data=None,
-                    validation_steps=None, validation_freq=1, workers=1, use_multiprocessing=False, shuffle=False, initial_epoch=0)
+                    validation_steps=None, validation_freq=1, workers=5, use_multiprocessing=False, shuffle=False, initial_epoch=0)
