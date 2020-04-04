@@ -19,12 +19,10 @@ def create(noise_dir: str, speech_dir: str, out_dir: str, frame_lenght: int, hop
         sampling {int} -- [description]
     """
     print("-> Reading noise files")
-    noice_files = [os.path.join(noise_dir, f)
-                   for f in os.scandir(noise_dir)][:10]
+    noice_files = list(os.scandir(noise_dir))[:10]
 
     print("-> Reading speech files")
-    speech_files = [os.path.join(speech_dir, f)
-                    for f in os.scandir(speech_dir)]
+    speech_files = list(os.scandir(speech_dir))
 
     print("-> Shuffling noise files")
     random.shuffle(noice_files)

@@ -53,4 +53,5 @@ find LibriSpeech/test-other/ -type f -name '*.flac' | xargs -I {} mv {} LibriSpe
 find LibriSpeech/test-other/ -maxdepth 1 -mindepth 1 -type d | xargs rm -r
 convert LibriSpeech/test-other
 
-
+wget https://github.com/karoldvl/ESC-50/archive/master.zip
+tar -xf master.zip && rm -r master.zip
