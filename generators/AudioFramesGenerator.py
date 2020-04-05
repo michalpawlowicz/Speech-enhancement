@@ -13,12 +13,17 @@ class AudioFramesGenerator():
             frame_length {int} -- [description]
             hop_length {int} -- [description]
         """
-        y, _ = librosa.load(sample, sr=sampling)
-        self.data = librosa.utils.frames(y, frame_length=frame_length, hop_length=hop_length, axis=0)
-        self.iter = iter(self.data)
+
+        self.sample = sample
+        self.sampling = sampling
+        self.frame_length = frame_length
+        self.hop_length = hop_length
 
     def __next__(self):
         return next(self.iter)
 
     def __iter__(self):
+        y, _ = librosa.load(self.sample, sr=self.sampling)
+        self.data = librosa.utils.frames(y, frame_length=self.frame_length, hop_length=self.hop_length, axis=0)
+        self.iter = iter(self.data)
         return self
