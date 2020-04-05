@@ -32,7 +32,6 @@ class Generator(Sequence):
             sx, sy = self.generator.shape()
             X = np.zeros((self.batch_size, self.input_shape[0], self.input_shape[1]))
             Y = np.zeros((self.batch_size, self.input_shape[0], self.input_shape[1]))
-            print("------------->", X.shape)
             for i in range(self.batch_size):
                 x, y = next(self.generator)
                 X[i, :, :] = x
