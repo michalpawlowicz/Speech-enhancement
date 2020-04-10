@@ -1,9 +1,48 @@
 import numpy as np
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, LeakyReLU, MaxPooling2D, Dropout, concatenate, UpSampling2D
+from tensorflow.keras.layers import Input, Conv2D, LeakyReLU, MaxPooling2D, Dropout, concatenate, UpSampling2D, Activation, Conv2DTranspose
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import backend
 import tensorflow as tf
+
+def unet_layer(inputs, filters):
+    x = Conv2D(filters=filters, padding="same", kernel_size=(3, 3), kernel_initializer="he_normal")(inputs)
+    x = Activation('relu')(x)
+    x = Conv2D(filters=filters, padding="same", kernel_size=(3, 3), kernel_initializer="he_normal")(x)
+    x = Activation('relu')(x)
+    return x
+
+
+def get_unet(input_size = (128,128,1)):
+    filter_size = 16
+    dropout = 0.1
+
+    inputs = Input(input_size)
+
+    l1 = unet_layer(inputs, filter_size * 1)
+    p1 = MaxPooling2D((2, 2), padding='same')(l1)
+    p1 = Dropout(dropout)(p1)
+
+    l2 = unet_layer(p1, filter_size * 2)
+    p2 = MaxPooling2D((2, 2), padding='same')(l2)
+    p2 = Dropout(dropout)(p2)
+
+    l3 = unet_layer(p2, filter_size * 4)
+    p3 = MaxPooling2D((2, 2), padding='same')(l3)
+    p3 = Dropout(dropout)(p3)
+
+    l4 = unet_layer(p3, filter_size * 8)
+
+    u1 = Conv2DTranspose(filter_size * 4, kernel_size=(3, 3), strides = (2, 2), padding = 'same')(l4)
+    u2 = Conv2DTranspose(filter_size * 2, kernel_size=(3, 3), strides = (2, 2), padding = 'same')(u1)
+    u3 = Conv2DTranspose(filter_size * 1, kernel_size=(3, 3), strides = (2, 2), padding = 'same')(u2)
+    u4 = Conv2D(1, kernel_size=(1, 1), strides = (1, 1), padding = 'same')(u3)
+
+    model = Model(inputs, u4)
+    model.compile(optimizer = 'adam', loss = tf.keras.losses.Huber(), metrics = ['mae'])
+    model.summary()
+    return model
+
 
 #Unet network
 def unet(pretrained_weights = None,input_size = (128,128,1)):
@@ -81,5 +120,7 @@ def unet(pretrained_weights = None,input_size = (128,128,1)):
 
     if(pretrained_weights):
     	model.load_weights(pretrained_weights)
+
+    model.summary()
 
     return model

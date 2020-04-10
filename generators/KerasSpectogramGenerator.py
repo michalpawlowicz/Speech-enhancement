@@ -29,7 +29,6 @@ class Generator(Sequence):
     def __getitem__(self, index):
         print("Batch: {0} / {1}".format(index, self.__len__()))
         try:
-            sx, sy = self.generator.shape()
             X = np.zeros((self.batch_size, self.input_shape[0], self.input_shape[1]))
             Y = np.zeros((self.batch_size, self.input_shape[0], self.input_shape[1]))
             for i in range(self.batch_size):

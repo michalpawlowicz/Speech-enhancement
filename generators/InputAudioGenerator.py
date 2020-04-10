@@ -1,8 +1,8 @@
 from generators.AudioGenerator import AudioGenerator
 from typing import Tuple
+from collections import Iterator
 
-
-class InputAudioGererator():
+class InputAudioGererator(Iterator):
     """[summary]
     """
 

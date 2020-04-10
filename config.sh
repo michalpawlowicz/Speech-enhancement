@@ -8,5 +8,9 @@ export TRAIN_NOISY=./data/Train/sound/
 export TEST_NOISY=./data/Test/sound/
 
 export SAMPLING=16000
-export FRAME_LENGHT=16384
-export HOP=4096
+export FRAME_LENGHT=16000
+export HOP=1024
+
+# fft parameters
+export HOP_LENGTH=50
+export FFT=512

@@ -1,6 +1,7 @@
 import librosa
+from collections import Iterator
 
-class AudioFramesGenerator():
+class AudioFramesGenerator(Iterator):
     """[summary]
     """
 
@@ -19,11 +20,12 @@ class AudioFramesGenerator():
         self.frame_length = frame_length
         self.hop_length = hop_length
 
+        y, _ = librosa.load(self.sample, sr=self.sampling)
+        self.data = librosa.util.frame(y, frame_length=self.frame_length, hop_length=self.hop_length, axis=0)
+        self.iter = iter(self.data)
+
     def __next__(self):
         return next(self.iter)
 
     def __iter__(self):
-        y, _ = librosa.load(self.sample, sr=self.sampling)
-        self.data = librosa.utils.frames(y, frame_length=self.frame_length, hop_length=self.hop_length, axis=0)
-        self.iter = iter(self.data)
         return self

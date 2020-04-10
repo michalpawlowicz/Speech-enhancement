@@ -1,4 +1,4 @@
-from model_unet import unet
+from model_unet import unet, get_unet
 import os
 import librosa
 import itertools
@@ -9,6 +9,7 @@ import pickle
 import keras
 import matplotlib.pyplot as plt
 import librosa.display
+import tensorflow as tf
 
 from generators.preprocess.Utils import read_sample, read_files, count_samples
 from generators.AudioFramesGenerator import AudioFramesGenerator
@@ -79,10 +80,15 @@ clean_audio_generator = AudioGenerator(
     clean_files, sampling, frame_lenght, hop)
 input_audio_generatpr = InputAudioGererator(
     noisy_audio_generator, clean_audio_generator)
-spectogram_generator = SpectogramGenerator(input_audio_generatpr, 512)
+spectogram_generator = SpectogramGenerator(generator=input_audio_generatpr, n_fft=512, hop_length=64)
 
 generator = Generator(64, samples_nb, spectogram_generator)
 
-model = unet(input_size=generator.input_shape)
-model.fit_generator(generator, steps_per_epoch=None, epochs=1, verbose=1, callbacks=None, validation_data=None,
-                    validation_steps=None, validation_freq=1, workers=5, use_multiprocessing=False, shuffle=False, initial_epoch=0)
+model = get_unet(input_size=(512, 512, 1))
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.Session(config=config)
+
+#model.fit_generator(generator, steps_per_epoch=None, epochs=1, verbose=1, callbacks=None, validation_data=None,
+#                    validation_steps=None, validation_freq=1, workers=5, use_multiprocessing=False, shuffle=False, initial_epoch=0)
