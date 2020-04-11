@@ -18,7 +18,7 @@ class SpectogramGenerator(Iterator):
         self.hop_length = hop_length
 
     def shape(self):
-        return 257, 251
+        return 128, 128
 
     def __iter__(self):
         return self

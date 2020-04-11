@@ -19,49 +19,21 @@ from generators.SpectogramGenerator import SpectogramGenerator
 from generators.KerasSpectogramGenerator import Generator
 from generators.preprocess.Preprocess import create
 
+from environment import check_environment_variables, variables
 
-if "TRAIN_CLEAN" not in os.environ:
-    print("Setup TRAIN_CLEAN variable to directory with clean speech")
-    sys.exit(1)
+env = check_environment_variables(variables)
+if env is None:
+    raise RuntimeError("Setup variables")
 
-if "TRAIN_NOISE" not in os.environ:
-    print("Setup TRAIN_NOISE variable to directory with noise")
-    sys.exit(2)
+sampling = int(env["SAMPLING"])
+frame_length = int(env["FRAME_LENGTH"])
+hop = int(env["HOP"])
 
-if "SAMPLING" not in os.environ:
-    print("Setup SAMPLING variable")
-    sys.exit(4)
+create(noise_dir=env["TRAIN_NOISE"], speech_dir=env["TRAIN_CLEAN"], out_dir=env["TRAIN_NOISY"], frame_lenght=frame_length, hop=hop, sampling=sampling)
 
-if "FRAME_LENGHT" not in os.environ:
-    print("Setup FRAME_LENGHT variable")
-    sys.exit(5)
-
-if "HOP" not in os.environ:
-    print("Setup HOP variable")
-    sys.exit(6)
-
-if "TRAIN_NOISY" not in os.environ:
-    print("Setup TRAIN_NOISY variable")
-    sys.exit(7)
-
-if "TEST_NOISY" not in os.environ:
-    print("Setup TEST_NOISY variable")
-    sys.exit(8)
-
-print("Train clean data: ", os.environ["TRAIN_CLEAN"])
-print("Train noise data: ", os.environ["TRAIN_NOISE"])
-print("Sampling: ", os.environ["SAMPLING"])
-
-sampling = int(os.environ["SAMPLING"])
-hop = int(os.environ["HOP"])
-frame_lenght = int(os.environ["FRAME_LENGHT"])
-
-create(noise_dir=os.environ["TRAIN_NOISE"], speech_dir=os.environ["TRAIN_CLEAN"], out_dir=os.environ["TRAIN_NOISY"], frame_lenght=int(
-    os.environ["FRAME_LENGHT"]), hop=int(os.environ["HOP"]), sampling=int(os.environ["SAMPLING"]))
-
-noisy_files = [d.path for d in os.scandir(os.environ["TRAIN_NOISY"])]
+noisy_files = [d.path for d in os.scandir(env["TRAIN_NOISY"])]
 sorted(noisy_files)
-clean_files = [d.path for d in os.scandir(os.environ["TRAIN_CLEAN"])]
+clean_files = [d.path for d in os.scandir(env["TRAIN_CLEAN"])]
 sorted(clean_files)
 
 if len(noisy_files) != len(clean_files):
@@ -71,20 +43,24 @@ for x, y in zip(noisy_files, clean_files):
     if os.path.basename(x) != os.path.basename(y):
         raise RuntimeError("Samples are different! {0} vs {1}".format(x, y))
 
-samples_nb = count_samples(noisy_files, sampling, frame_lenght, hop)
+
+samples_nb = count_samples(noisy_files, sampling, frame_length, hop)
 print("Number of samples: ", samples_nb)
 
+n_fft = int(env["N_FFT"])
+fft_hop = int(env["STFT_HOP_LENGTH"])
+
 noisy_audio_generator = AudioGenerator(
-    noisy_files, sampling, frame_lenght, hop)
+    noisy_files, sampling, frame_length, hop)
 clean_audio_generator = AudioGenerator(
-    clean_files, sampling, frame_lenght, hop)
-input_audio_generatpr = InputAudioGererator(
+    clean_files, sampling, frame_length, hop)
+input_audio_generator = InputAudioGererator(
     noisy_audio_generator, clean_audio_generator)
-spectogram_generator = SpectogramGenerator(generator=input_audio_generatpr, n_fft=512, hop_length=64)
+spectogram_generator = SpectogramGenerator(generator=input_audio_generator, n_fft=fft_hop, hop_length=fft_hop)
 
 generator = Generator(64, samples_nb, spectogram_generator)
 
-model = get_unet(input_size=(512, 512, 1))
+model = get_unet(input_size=generator.input_shape)
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
