@@ -14,3 +14,6 @@ export HOP=1024
 # fft parameters
 export STFT_HOP_LENGTH=64
 export N_FFT=255
+
+# directory to store model's checkpoint
+export CHECKPOINTS_DIR=./checkpoints/

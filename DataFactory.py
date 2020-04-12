@@ -1,4 +1,5 @@
 from model_unet import unet, get_unet
+import datetime
 import os
 import librosa
 import itertools
@@ -10,6 +11,8 @@ import keras
 import matplotlib.pyplot as plt
 import librosa.display
 import tensorflow as tf
+
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 from generators.preprocess.Utils import read_sample, read_files, count_samples
 from generators.AudioFramesGenerator import AudioFramesGenerator
@@ -29,7 +32,7 @@ sampling = int(env["SAMPLING"])
 frame_length = int(env["FRAME_LENGTH"])
 hop = int(env["HOP"])
 
-create(noise_dir=env["TRAIN_NOISE"], speech_dir=env["TRAIN_CLEAN"], out_dir=env["TRAIN_NOISY"], frame_lenght=frame_length, hop=hop, sampling=sampling)
+#create(noise_dir=env["TRAIN_NOISE"], speech_dir=env["TRAIN_CLEAN"], out_dir=env["TRAIN_NOISY"], frame_lenght=frame_length, hop=hop, sampling=sampling)
 
 noisy_files = [d.path for d in os.scandir(env["TRAIN_NOISY"])]
 sorted(noisy_files)
@@ -56,15 +59,22 @@ clean_audio_generator = AudioGenerator(
     clean_files, sampling, frame_length, hop)
 input_audio_generator = InputAudioGererator(
     noisy_audio_generator, clean_audio_generator)
-spectogram_generator = SpectogramGenerator(generator=input_audio_generator, n_fft=fft_hop, hop_length=fft_hop)
+spectogram_generator = SpectogramGenerator(generator=input_audio_generator, n_fft=n_fft, hop_length=fft_hop)
 
-generator = Generator(64, samples_nb, spectogram_generator)
+generator = Generator(128, samples_nb, spectogram_generator)
 
-model = get_unet(input_size=generator.input_shape)
+model = unet(input_size=generator.input_shape)
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 session = tf.Session(config=config)
 
-#model.fit_generator(generator, steps_per_epoch=None, epochs=1, verbose=1, callbacks=None, validation_data=None,
-#                    validation_steps=None, validation_freq=1, workers=5, use_multiprocessing=False, shuffle=False, initial_epoch=0)
+checkpoint_name = "cp-{epoch:04d}.h5"
+checkpoint_path = os.path.join(env["CHECKPOINTS_DIR"], checkpoint_name)
+checkpoint = ModelCheckpoint(checkpoint_path, verbose=1, monitor='val_loss', save_best_only=True, mode='auto', period=1)
+
+log_dir = "logs/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, update_freq='epoch', write_graph=True, profile_batch=0)
+
+model.fit_generator(generator, steps_per_epoch=None, epochs=100, verbose=1, callbacks=[checkpoint, tensorboard_callback], validation_data=None,
+                    validation_steps=None, validation_freq=1, workers=8, use_multiprocessing=False, shuffle=False, initial_epoch=0)

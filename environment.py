@@ -1,6 +1,6 @@
 import os
 
-variables = ["TRAIN_CLEAN", "TRAIN_NOISE", "TEST_CLEAN", "TEST_NOISE", "TRAIN_NOISY", "TEST_NOISY", "SAMPLING", "FRAME_LENGTH", "HOP", "STFT_HOP_LENGTH", "N_FFT"]
+variables = ["TRAIN_CLEAN", "TRAIN_NOISE", "TEST_CLEAN", "TEST_NOISE", "TRAIN_NOISY", "TEST_NOISY", "SAMPLING", "FRAME_LENGTH", "HOP", "STFT_HOP_LENGTH", "N_FFT", "CHECKPOINTS_DIR"]
 
 def check_environment_variables(variables):
     env = dict()
