@@ -1,6 +1,29 @@
 import os
 
-variables = ["TRAIN_CLEAN", "TRAIN_NOISE", "TEST_CLEAN", "TEST_NOISE", "TRAIN_NOISY", "TEST_NOISY", "SAMPLING", "FRAME_LENGTH", "HOP", "STFT_HOP_LENGTH", "N_FFT", "CHECKPOINTS_DIR"]
+variables = ["TRAIN_CLEAN",
+             "TRAIN_NOISE",
+             "TEST_CLEAN",
+             "TEST_NOISE",
+             "TRAIN_NOISY",
+             "TEST_NOISY",
+             "SAMPLING",
+             "FRAME_LENGTH",
+             "HOP",
+             "STFT_HOP_LENGTH",
+             "N_FFT",
+             "CHECKPOINTS_DIR",
+             "BATCH_SIZE",
+             "TRAIN_PICKLED_DATA",
+             "SAMPLIFY_TRAIN_CLEAN",
+             "SAMPLIFY_TRAIN_NOISY",
+             "SAMPLIFY_TEST_CLEAN",
+             "SAMPLIFY_TEST_NOISY",
+             "SPECTROGRAM_TRAIN_CLEAN",
+             "SPECTROGRAM_TRAIN_NOISY",
+             "SPECTROGRAM_TEST_CLEAN",
+             "SPECTROGRAM_TEST_NOISY",
+             "SAMPLIFY_NPY_SIZE"]
+
 
 def check_environment_variables(variables):
     env = dict()
@@ -11,7 +34,7 @@ def check_environment_variables(variables):
             env[variable] = os.environ[variable]
     if len(variables) != len(env):
         return None
-    
+
     print("Variables:")
     for variable in env:
         print("    ", variable, env[variable])

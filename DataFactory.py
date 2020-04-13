@@ -36,8 +36,10 @@ hop = int(env["HOP"])
 
 noisy_files = [d.path for d in os.scandir(env["TRAIN_NOISY"])]
 sorted(noisy_files)
+noisy_files = noisy_files[:10]
 clean_files = [d.path for d in os.scandir(env["TRAIN_CLEAN"])]
 sorted(clean_files)
+clean_files = clean_files[:10]
 
 if len(noisy_files) != len(clean_files):
     raise RuntimeError("Number of clean samples and noisy samples is different {0} vs. {1}".format(len(noisy_files), len(clean_files)))
@@ -61,7 +63,7 @@ input_audio_generator = InputAudioGererator(
     noisy_audio_generator, clean_audio_generator)
 spectogram_generator = SpectogramGenerator(generator=input_audio_generator, n_fft=n_fft, hop_length=fft_hop)
 
-generator = Generator(128, samples_nb, spectogram_generator)
+generator = Generator(int(env["BATCH_SIZE"]), samples_nb, spectogram_generator)
 
 model = unet(input_size=generator.input_shape)
 

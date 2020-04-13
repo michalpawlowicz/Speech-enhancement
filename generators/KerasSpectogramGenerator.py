@@ -24,7 +24,10 @@ class Generator(Sequence):
         self.input_shape = (generator.shape()[0], generator.shape()[1], 1)
 
     def __len__(self):
-        return int(np.ceil(self.samples_nb / float(self.batch_size)))
+        print("Samples nb: ", self.samples_nb)
+        print("Batch size: ", self.batch_size)
+        print("Batch number: ", int(np.ceil(self.samples_nb / float(self.batch_size))))
+        return int(np.floor(self.samples_nb / float(self.batch_size)))
 
     def __getitem__(self, index):
         print("Batch: {0} / {1}".format(index, self.__len__()))
