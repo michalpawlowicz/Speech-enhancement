@@ -1,6 +1,6 @@
 export ROOT=./data
 
-export TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/dev-clean
+export TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/train-clean-100/
 export TRAIN_NOISE=/home/michal/ESC-50/ESC-50-master/audio
 
 export TEST_CLEAN=/home/michal/OpenSLR/LibriSpeech/test-clean

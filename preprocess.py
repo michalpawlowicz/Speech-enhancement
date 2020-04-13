@@ -61,7 +61,7 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, frame_length: int, h
         hop {int} -- [description]
         sampling {int} -- [description]
     """
-    noice_files = list(os.scandir(noise_dir))
+    noice_files = list(os.scandir(noise_dir))[:10]
     speech_files = list(os.scandir(speech_dir))
 
     random.shuffle(noice_files)

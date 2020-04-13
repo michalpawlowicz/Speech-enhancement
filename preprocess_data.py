@@ -28,7 +28,7 @@ if len(train_clean) != len(train_noisy):
 
 for x, y in zip(train_clean, train_noisy):
     if os.path.basename(x) != os.path.basename(y):
-        raise RuntimeError("Different sample sets!")
+        raise RuntimeError("Different sample sets! broke on {0} vs {1}".format(x, y))
 
 samplify(train_clean, env["SAMPLIFY_TRAIN_CLEAN"],
          samples_nb, frame_length, hop, sampling, samplify_npy_size)
