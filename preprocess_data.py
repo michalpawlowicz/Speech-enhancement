@@ -15,7 +15,7 @@ create(env["TRAIN_NOISE"], env["TRAIN_CLEAN"],
        env["TRAIN_NOISY"], frame_length, hop, sampling)
 
 samples_nb = count_samples(
-    list(os.scandir(env["TRAIN_NOISY"])), sampling, frame_length, hop)
+    list(os.scandir(env["TRAIN_NOISY"])), sampling, frame_length)
 
 train_clean = [p.path for p in os.scandir(env["TRAIN_CLEAN"])]
 sorted(train_clean, key=lambda p: os.path.basename(p))

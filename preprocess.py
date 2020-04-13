@@ -38,7 +38,6 @@ def count_samples(audio_files: List[str], sampling: int, frame_length: int) -> i
         audio_files {List[str]} -- [description]
         sampling {int} -- [description]
         frame_length {int} -- [description]
-        hop {int} -- [description]
 
     Returns:
         int -- [description]
@@ -62,8 +61,7 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, frame_length: int, h
         hop {int} -- [description]
         sampling {int} -- [description]
     """
-    noice_files = list(os.scandir(noise_dir))[:10]
-
+    noice_files = list(os.scandir(noise_dir))
     speech_files = list(os.scandir(speech_dir))
 
     random.shuffle(noice_files)

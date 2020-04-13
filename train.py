@@ -1,9 +1,10 @@
-from environment import check_environment_variables, variables
 import os
-from model_unet import get_unet, unet
 import numpy as np
 import tensorflow as tf
 import time
+import keras
+from environment import check_environment_variables, variables
+from model_unet import get_unet, unet
 
 env = check_environment_variables(variables)
 
@@ -23,8 +24,7 @@ session = tf.Session(config=config)
 # Save best models to disk during training
 checkpoint_name = "cp-{epoch:04d}.h5"
 checkpoint_path = os.path.join(env["CHECKPOINTS_DIR"], checkpoint_name)
-checkpoint = ModelCheckpoint(
-checkpoint_path, verbose=1, monitor='val_loss', save_best_only=True, mode='auto', period=1)
+checkpoint = keras.callbacks.callbacks.ModelCheckpoint(checkpoint_path, verbose=1, monitor='val_loss', save_best_only=True, mode='auto', period=1)
 log_dir = "logs/model-{}".format(int(time.time()))
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, update_freq='epoch', write_graph=True, profile_batch=0)
 
