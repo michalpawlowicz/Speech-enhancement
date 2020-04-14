@@ -11,8 +11,8 @@ samplify_npy_size = int(env["SAMPLIFY_NPY_SIZE"])
 n_fft = int(env["N_FFT"])
 fft_hop_length = int(env["STFT_HOP_LENGTH"])
 
-create(env["TRAIN_NOISE"], env["TRAIN_CLEAN"],
-       env["TRAIN_NOISY"], frame_length, hop, sampling)
+create(env["INPUT_TRAIN_NOISE"], env["INPUT_TRAIN_CLEAN"],
+       env["TRAIN_NOISY"], env["TRAIN_CLEAN"], frame_length, hop, sampling)
 
 samples_nb = count_samples(
     list(os.scandir(env["TRAIN_NOISY"])), sampling, frame_length)
@@ -28,7 +28,8 @@ if len(train_clean) != len(train_noisy):
 
 for x, y in zip(train_clean, train_noisy):
     if os.path.basename(x) != os.path.basename(y):
-        raise RuntimeError("Different sample sets! broke on {0} vs {1}".format(x, y))
+        raise RuntimeError(
+            "Different sample sets! broke on {0} vs {1}".format(x, y))
 
 samplify(train_clean, env["SAMPLIFY_TRAIN_CLEAN"],
          samples_nb, frame_length, hop, sampling, samplify_npy_size)

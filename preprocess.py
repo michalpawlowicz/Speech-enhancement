@@ -50,7 +50,7 @@ def count_samples(audio_files: List[str], sampling: int, frame_length: int) -> i
     return count
 
 
-def create(noise_dir: str, speech_dir: str, noisy_dir: str, frame_length: int, hop: int, sampling: int) -> None:
+def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, frame_length: int, hop: int, sampling: int) -> None:
     """[summary]
 
     Arguments:
@@ -75,11 +75,13 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, frame_length: int, h
         y, _ = librosa.load(sample_file, sr=sampling)
         y = librosa.util.frame(y, frame_length=frame_length,
                                hop_length=frame_length, axis=0)
+        filename = os.path.splitext(os.path.basename(sample_file))[0] + ".wav"
+        librosa.output.write_wav(os.path.join(
+            clean_dir, filename), y.reshape(1, -1)[0], sr=sampling)
         indexes = np.random.randint(0, noise_frames.shape[0], y.shape[0])
         magnitutes = np.random.uniform(.2, .6, y.shape[0])
         for i, index in enumerate(indexes):
             y[i, :] = y[i, :] + magnitutes[i] * noise_frames[index, :]
-        filename = os.path.splitext(os.path.basename(sample_file))[0] + ".wav"
         librosa.output.write_wav(os.path.join(
             noisy_dir, filename), y.reshape(1, -1)[0], sr=sampling)
         bar.next()

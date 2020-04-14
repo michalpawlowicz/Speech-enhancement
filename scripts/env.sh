@@ -7,8 +7,11 @@ fi
 
 rm -rf $ROOT
 
-mkdir -p $ROOT/Train/sound
-mkdir -p $ROOT/Test/sound
+mkdir -p $ROOT/Train/noisy
+mkdir -p $ROOT/Test/noisy
+
+mkdir -p $ROOT/Train/clean
+mkdir -p $ROOT/Test/clean
 
 mkdir -p $ROOT/Train/samplify/clean
 mkdir -p $ROOT/Train/samplify/noisy

@@ -1,13 +1,17 @@
 export ROOT=./data
 
-export TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/train-clean-100/
-export TRAIN_NOISE=/home/michal/ESC-50/ESC-50-master/audio
+#export INPUT_TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/train-clean-100/
+export INPUT_TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/dev-clean/
+export INPUT_TRAIN_NOISE=/home/michal/ESC-50/ESC-50-master/audio
 
-export TEST_CLEAN=/home/michal/OpenSLR/LibriSpeech/test-clean
-export TEST_NOISE=/home/michal/ESC-50/ESC-50-master/audio
+export INPUT_TEST_CLEAN=/home/michal/OpenSLR/LibriSpeech/test-clean
+export INPUT_TEST_NOISE=/home/michal/ESC-50/ESC-50-master/audio
 
-export TRAIN_NOISY=$ROOT/Train/sound/
-export TEST_NOISY=$ROOT/Test/sound/
+export TRAIN_NOISY=$ROOT/Train/noisy
+export TEST_NOISY=$ROOT/Test/noisy
+
+export TRAIN_CLEAN=$ROOT/Train/clean/
+export TEST_CLEAN=$ROOT/Test/clean
 
 export SAMPLING=16000
 export FRAME_LENGTH=8192
