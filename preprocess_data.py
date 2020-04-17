@@ -1,5 +1,6 @@
 from environment import check_environment_variables, variables
 from preprocess import create, samplify, spectrogramplify, count_samples
+from sklearn.preprocessing import normalize
 import os
 import librosa
 
@@ -14,14 +15,11 @@ fft_hop_length = int(env["STFT_HOP_LENGTH"])
 create(env["INPUT_TRAIN_NOISE"], env["INPUT_TRAIN_CLEAN"],
        env["TRAIN_NOISY"], env["TRAIN_CLEAN"], frame_length, hop, sampling)
 
-samples_nb = count_samples(
-    list(os.scandir(env["TRAIN_NOISY"])), sampling, frame_length)
-
 train_clean = [p.path for p in os.scandir(env["TRAIN_CLEAN"])]
-sorted(train_clean, key=lambda p: os.path.basename(p))
+train_clean = sorted(train_clean, key=lambda p: os.path.basename(p))
 
 train_noisy = [p.path for p in os.scandir(env["TRAIN_NOISY"])]
-sorted(train_noisy, key=lambda p: os.path.basename(p))
+train_noisy = sorted(train_noisy, key=lambda p: os.path.basename(p))
 
 if len(train_clean) != len(train_noisy):
     raise RuntimeError("Different size!")
@@ -32,14 +30,18 @@ for x, y in zip(train_clean, train_noisy):
             "Different sample sets! broke on {0} vs {1}".format(x, y))
 
 samplify(train_clean, env["SAMPLIFY_TRAIN_CLEAN"],
-         samples_nb, frame_length, hop, sampling, samplify_npy_size)
+         frame_length, hop, sampling, samplify_npy_size)
 samplify(train_noisy, env["SAMPLIFY_TRAIN_NOISY"],
-         samples_nb, frame_length, hop, sampling, samplify_npy_size)
+         frame_length, hop, sampling, samplify_npy_size)
 
 samplifiy_train_clean = [
     p.path for p in os.scandir(env["SAMPLIFY_TRAIN_CLEAN"])]
+samplifiy_train_clean = sorted(samplifiy_train_clean, key=lambda p: int(os.path.basename(p).split('.')[0]))
+
 samplifiy_train_noisy = [
     p.path for p in os.scandir(env["SAMPLIFY_TRAIN_NOISY"])]
+samplifiy_train_noisy = sorted(samplifiy_train_noisy, key=lambda p: int(os.path.basename(p).split('.')[0]))
+
 spectrogramplify(samplifiy_train_clean,
                  env["SPECTROGRAM_TRAIN_CLEAN"], n_fft, fft_hop_length)
 spectrogramplify(samplifiy_train_noisy,

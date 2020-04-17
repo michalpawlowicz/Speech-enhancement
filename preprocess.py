@@ -6,6 +6,7 @@ from progress.bar import Bar
 from typing import List
 from numpy import save
 import math
+from sklearn.preprocessing import MinMaxScaler
 
 
 def read_files(audio_files: List[str], sampling: int, frame_length: int) -> np.ndarray:
@@ -88,7 +89,7 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
     bar.finish()
 
 
-def samplify(audio_files: List[str], output_path: str, samples_nb: int, frame_length: int, hop: int, sampling: int, npy_samples_count: int):
+def samplify(audio_files: List[str], output_path: str, frame_length: int, hop: int, sampling: int, npy_samples_count: int):
     npy_frames = []
     npy_idx = 0
     samples_in_npy_frames = 0
@@ -97,8 +98,6 @@ def samplify(audio_files: List[str], output_path: str, samples_nb: int, frame_le
         y, _ = librosa.load(audio_file, sr=sampling)
         frames = librosa.util.frame(
             y, frame_length=frame_length, hop_length=frame_length, axis=0)
-        if frames[-1].shape[0] < frame_length:
-            frames = frames[0:-1]
         samples_in_npy_frames += frames.shape[0]
         npy_frames.append(frames)
         if samples_in_npy_frames > npy_samples_count:
@@ -119,6 +118,7 @@ def samplify(audio_files: List[str], output_path: str, samples_nb: int, frame_le
 
 
 def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, fft_hop_length: int):
+    scaler = MinMaxScaler()
     for idx, samples_path in enumerate(samples_npy):
         print("\nProcessing %s" % samples_path)
         samples = np.load(samples_path)
@@ -127,9 +127,13 @@ def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, f
         for sample in samples:
             magnitude, _ = librosa.magphase(librosa.stft(
                 sample, n_fft=n_fft, hop_length=fft_hop_length))
-            spectrograms.append(librosa.amplitude_to_db(magnitude, ref=np.max))
+            spectrogram = librosa.amplitude_to_db(magnitude, ref=np.max)
+            scaler.fit(spectrogram)
+            spectrogram = scaler.transform(spectrogram)
+            spectrograms.append(spectrogram)
             bar.next()
         output = os.path.join(spectrogram_out, "{}.npy".format(idx))
         print("\nWriting spectrograms to %s" % output)
         save(output, np.array(spectrograms))
         bar.finish()
+        break

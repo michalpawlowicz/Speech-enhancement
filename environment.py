@@ -23,7 +23,10 @@ variables = ["INPUT_TRAIN_CLEAN",
              "SPECTROGRAM_TRAIN_NOISY",
              "SPECTROGRAM_TEST_CLEAN",
              "SPECTROGRAM_TEST_NOISY",
-             "SAMPLIFY_NPY_SIZE"]
+             "SAMPLIFY_NPY_SIZE",
+             "PRED_IN_AUDIO",
+             "PRED_OUT_AUDIO",
+             "MODEL"]
 
 
 def check_environment_variables(variables):

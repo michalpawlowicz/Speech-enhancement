@@ -117,10 +117,6 @@ def unet(pretrained_weights = None,input_size = (128,128,1)):
     model = Model(inputs,conv10)
 
     model.compile(optimizer = 'adam', loss = tf.keras.losses.Huber(), metrics = ['mae'])
-
-    if(pretrained_weights):
-    	model.load_weights(pretrained_weights)
-
     model.summary()
 
     return model
