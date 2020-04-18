@@ -1,4 +1,17 @@
-export ROOT=./data
+export SAMPLING=16000
+export FRAME_LENGTH=16384
+export HOP=511 # not used
+
+# fft parameters
+export STFT_HOP_LENGTH=128
+export N_FFT=255
+
+# directory to store model's checkpoint
+export CHECKPOINTS_DIR=./checkpoints/
+
+export BATCH_SIZE=64
+
+export ROOT=./"data_nfft_"$N_FFT"_fft_hop_"$STFT_HOP_LENGTH"_frame_length_"$FRAME_LENGTH
 
 #export INPUT_TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/train-clean-100/
 export INPUT_TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/dev-clean/
@@ -12,19 +25,6 @@ export TEST_NOISY=$ROOT/Test/noisy
 
 export TRAIN_CLEAN=$ROOT/Train/clean/
 export TEST_CLEAN=$ROOT/Test/clean
-
-export SAMPLING=16000
-export FRAME_LENGTH=16384
-export HOP=511 # not used
-
-# fft parameters
-export STFT_HOP_LENGTH=64
-export N_FFT=511
-
-# directory to store model's checkpoint
-export CHECKPOINTS_DIR=./checkpoints/
-
-export BATCH_SIZE=64
 
 export SAMPLIFY_TRAIN_CLEAN=$ROOT/Train/samplify/clean/
 export SAMPLIFY_TRAIN_NOISY=$ROOT/Train/samplify/noisy/
@@ -41,5 +41,5 @@ export SPECTROGRAM_TEST_NOISY=$ROOT/Test/spectrogram/noisy/
 
 
 export MODEL=./checkpoints/best.h5
-export PRED_IN_AUDIO=./data/example_noisy.wav
-export PRED_OUT_AUDIO=./data/example_clean.wav
+export PRED_IN_AUDIO=$ROOT/noisy.wav
+export PRED_OUT_AUDIO=$ROOT/clean-predicted.wav

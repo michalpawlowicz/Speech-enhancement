@@ -62,7 +62,7 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
         hop {int} -- [description]
         sampling {int} -- [description]
     """
-    noice_files = list(os.scandir(noise_dir))[:10]
+    noice_files = list(os.scandir(noise_dir))
     speech_files = list(os.scandir(speech_dir))
 
     random.shuffle(noice_files)
@@ -136,4 +136,3 @@ def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, f
         print("\nWriting spectrograms to %s" % output)
         save(output, np.array(spectrograms))
         bar.finish()
-        break
