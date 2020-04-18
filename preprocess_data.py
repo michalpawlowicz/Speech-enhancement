@@ -6,7 +6,6 @@ import librosa
 
 env = check_environment_variables(variables)
 frame_length = int(env["FRAME_LENGTH"])
-hop = int(env["HOP"])
 sampling = int(env["SAMPLING"])
 samplify_npy_size = int(env["SAMPLIFY_NPY_SIZE"])
 n_fft = int(env["N_FFT"])

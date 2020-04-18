@@ -26,7 +26,6 @@ phases = []
 print(frames.shape)
 print(type(frames))
 
-
 scalers = []
 
 for i in range(frames.shape[0]):

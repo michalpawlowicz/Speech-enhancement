@@ -1,6 +1,5 @@
 export SAMPLING=16000
 export FRAME_LENGTH=16384
-export HOP=511 # not used
 
 # fft parameters
 export STFT_HOP_LENGTH=128
