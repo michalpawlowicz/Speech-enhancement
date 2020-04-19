@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import tensorflow as tf
-import logging
 import time
 import keras
 from environment import check_environment_variables, variables
@@ -9,14 +8,61 @@ from model import get_unet, unet
 from typing import List
 
 # Turn off tensorflow logging
-os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 
 def train_entry(**kwargs):
     workdir = kwargs["workdir"]
     log_dir = kwargs["logs"]
     checkpoint_dir = kwargs["checkpoints"]
-    checkpoint_base_name = kwargs["checkpoint_base_name"]
     epochs = kwargs["epochs"]
+    input_size = kwargs["input_size"]
+
+    spectrogram_train_clean = os.path.join(
+        workdir, "Train", "spectrogram", "clean")
+    spectrogram_test_clean = os.path.join(
+        workdir, "Test", "spectrogram", "clean")
+
+    spectrogram_train_noisy = os.path.join(
+        workdir, "Train", "spectrogram", "noisy")
+    spectrogram_test_noisy = os.path.join(
+        workdir, "Test", "spectrogram", "noisy")
+
+    X_paths = sorted(map(lambda direntry: direntry.path,
+                         os.scandir(spectrogram_train_noisy)))
+    y_paths = sorted(map(lambda direntry: direntry.path,
+                         os.scandir(spectrogram_train_clean)))
+
+    X_test_paths = sorted(map(lambda direntry: direntry.path,
+                              os.scandir(spectrogram_test_noisy)))
+    y_test_paths = sorted(map(lambda direntry: direntry.path,
+                              os.scandir(spectrogram_test_clean)))
+
+    train_generator = Generator(X_paths, y_paths, epochs)
+    test_generator = Generator(X_test_paths, y_test_paths, epochs)
+
+    config = tf.compat.v1.ConfigProto()
+    config.gpu_options.allow_growth = True
+    tf.compat.v1.Session(config=config)
+
+    callbacks = []
+    if log_dir is not None:
+        log_dir = "logs/model-{0}".format(int(time.time()))
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=os.path.join(
+            log_dir, "model-{0}".format(time.time())), update_freq='epoch', write_graph=True, profile_batch=0)
+        callbacks.append(tensorboard_callback)
+
+    if checkpoint_dir is not None:
+        name = "model-cp-epoch_{epoch:04d}.h5"
+        path = os.path.join(checkpoint_dir, name)
+        checkpoint = keras.callbacks.callbacks.ModelCheckpoint(
+            path, verbose=1, monitor='val_loss', save_best_only=True, mode='auto', period=1)
+        callbacks.append(checkpoint)
+
+    model = unet(input_size=input_size)
+    model.fit_generator(train_generator, epochs=epochs, shuffle=True, callbacks=callbacks, verbose=1,
+                        workers=6, use_multiprocessing=True, validation_data=test_generator, validation_freq=1)
+
 
 class Generator(tf.keras.utils.Sequence):
     def __init__(self, x_npy_files: List[str], y_npy_files: List[str], batch_size: int):
@@ -64,40 +110,10 @@ class Generator(tf.keras.utils.Sequence):
         self.y_generator = lazy_numpy_vstack(self.y_samples_list)
 
 
+args = {"workdir": os.environ["ROOT"],
+        "logs": "logs/",
+        "checkpoints": "checkpoints/",
+        "epochs": 128,
+        "input_size": (128, 128, 1)}
 
-env = check_environment_variables(variables)
-
-X_paths = sorted(map(lambda direntry: direntry.path,
-                     os.scandir(env["SPECTROGRAM_TRAIN_NOISY"])))
-y_paths = sorted(map(lambda direntry: direntry.path,
-                     os.scandir(env["SPECTROGRAM_TRAIN_CLEAN"])))
-
-g = Generator(X_paths, y_paths, 128)
-
-X_test_paths = sorted(map(lambda direntry: direntry.path,
-                     os.scandir(env["SPECTROGRAM_TEST_NOISY"])))
-y_test_paths = sorted(map(lambda direntry: direntry.path,
-                     os.scandir(env["SPECTROGRAM_TEST_CLEAN"])))
-
-g_test = Generator(X_test_paths, y_test_paths, 128)
-
-config = tf.compat.v1.ConfigProto()
-config.gpu_options.allow_growth = True
-tf.compat.v1.Session(config=config)
-
-# Save best models to disk during training
-base_name = "data_nfft_{0}_fft_hop_{1}_frame_length_{2}".format(
-    env["N_FFT"], env["STFT_HOP_LENGTH"], env["FRAME_LENGTH"])
-checkpoint_name = base_name + "-cp-epoch_{epoch:04d}.h5"
-checkpoint_path = os.path.join(
-    "/home/michal/Documents/Speech-enhancement/checkpoints", checkpoint_name)
-checkpoint = keras.callbacks.callbacks.ModelCheckpoint(
-    checkpoint_path, verbose=1, monitor='val_loss', save_best_only=True, mode='auto', period=1)
-
-log_dir = "logs/model-{0}-{1}".format(base_name, int(time.time()))
-tensorboard_callback = tf.keras.callbacks.TensorBoard(
-    log_dir=log_dir, update_freq='epoch', write_graph=True, profile_batch=0)
-
-model = unet(input_size=(128, 128, 1))
-model.fit_generator(g, epochs=50, shuffle=True, callbacks=[
-                    checkpoint, tensorboard_callback], verbose=1, workers=6, use_multiprocessing=True, validation_data=g_test, validation_freq=1)
+train_entry(**args)
