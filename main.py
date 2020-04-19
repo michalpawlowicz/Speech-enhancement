@@ -1,7 +1,7 @@
 import argparse
-import os
 import sys
-from preproces_data import preprocess_data_entry
+
+from preprocess_data import preprocess_data_entry
 from train import train_entry
 from predict import predict_entry
 
@@ -31,6 +31,9 @@ if __name__ == "__main__":
     optional.add_argument('--checkpoints-dir', dest='checkpoints_dir',
                           type=int, help='Directory to store NN checkpoints during training')
 
+    optional.add_argument('--tensorboard-logs-dir', dest='tensorboard_logs_dir',
+                          default=None, type=str, help="Directory to store tensorboard logs")
+
     training.add_argument('--batch-size', dest='batch_size',
                           default=64, type=int, help='Training batch size')
 
@@ -58,23 +61,9 @@ if __name__ == "__main__":
         print("Invalid mode")
         sys.exit(1)
 
-    def check_parameters(vars):
-        any_missing = False
-        for var in vars:
-            if var not in args:
-                any_missing = True
-                print("Missing parameter: ", var)
-        if any_missing:
-            sys.exit(1)
-
     if args["mode"] == "GENERATE":
-        check_parameters(["root_dir", "intput_train_clean", "intput_train_noise",
-                          "intput_test_clean", "intput_test_noise", "samplify_npy_size"])
         preprocess_data_entry(**args)
     elif args["mode"] == "TRAIN":
-        check_parameters(["batch_size", "root_dir"])
         train_entry(**args)
     elif args["mode"] == "PREDICT":
-        check_parameters(["model", "in_predict", "out_predict"])
         predict_entry(**args)
-

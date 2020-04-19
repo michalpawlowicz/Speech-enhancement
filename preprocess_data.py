@@ -14,6 +14,8 @@ fft_hop_length = int(env["STFT_HOP_LENGTH"])
 
 
 def preprocess_data_entry(**kwargs):
+    pass
+    """
     train_noisy = os.path.join(args["root_dir"], "Train", "noisy")
     test_noisy = os.path.join(args["root_dir"], "Test", "noisy")
 
@@ -45,6 +47,7 @@ def preprocess_data_entry(**kwargs):
 
     preprocess_data(env["input_test_noise"], env["input_test_clean"], test_noisy, test_clean, samplify_test_noisy,
                     samplify_test_clean, spectrogram_test_noisy, spectrogram_test_clean, args["frame_length"], args["sampling"])
+    """
 
 
 def preprocess_data(input_noise_dir: str, input_clean_dir: str, noisy_audio_dir: str, clean_audio_dir: str, samplify_noisy_dir: str, samplify_clean_dir: str, spectrogramify_clean_dir: str, spectrogramify_noisy_dir: str, frame_length: int, sampling: int):
@@ -78,7 +81,7 @@ def preprocess_data(input_noise_dir: str, input_clean_dir: str, noisy_audio_dir:
     if len(clean_audio_paths) != len(noisy_audio_paths):
         raise RuntimeError("Different sets size!")
 
-    if any(os.path.basename(x) != os.path.basename(y) for (x, y) in zip(clean_audio_dir, noisy_audio_paths)):
+    if any(os.path.basename(x) != os.path.basename(y) for (x, y) in zip(clean_audio_paths, noisy_audio_paths)):
         raise RuntimeError("Different sample sets!")
 
     samplify(clean_audio_paths, samplify_clean_dir,
