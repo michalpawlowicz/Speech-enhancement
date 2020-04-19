@@ -12,7 +12,11 @@ from typing import List
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 
 def train_entry(**kwargs):
-    pass
+    workdir = kwargs["workdir"]
+    log_dir = kwargs["logs"]
+    checkpoint_dir = kwargs["checkpoints"]
+    checkpoint_base_name = kwargs["checkpoint_base_name"]
+    epochs = kwargs["epochs"]
 
 class Generator(tf.keras.utils.Sequence):
     def __init__(self, x_npy_files: List[str], y_npy_files: List[str], batch_size: int):

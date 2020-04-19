@@ -32,34 +32,19 @@ def read_files(audio_files: List[str], sampling: int, frame_length: int) -> np.n
     return np.vstack(audio_stacks)
 
 
-def count_samples(audio_files: List[str], sampling: int, frame_length: int) -> int:
-    """[summary]
-
-    Arguments:
-        audio_files {List[str]} -- [description]
-        sampling {int} -- [description]
-        frame_length {int} -- [description]
-
-    Returns:
-        int -- [description]
-    """
-    count = 0
-    for f in audio_files:
-        y, _ = librosa.load(f, sr=sampling)
-        count += len(librosa.util.frame(y, frame_length=frame_length,
-                                        hop_length=frame_length, axis=0))
-    return count
-
-
-def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, frame_length: int, sampling: int) -> None:
+def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, frame_length: int, sampling: int) -> int:
     """[summary]
 
     Arguments:
         noise_dir {str} -- [description]
         speech_dir {str} -- [description]
         noisy_dir {str} -- [description]
+        clean_dir {str} -- [description]
         frame_length {int} -- [description]
         sampling {int} -- [description]
+
+    Returns:
+        int -- [Total number of generated samples]
     """
     noice_files = list(os.scandir(noise_dir))
     speech_files = list(os.scandir(speech_dir))
@@ -70,11 +55,14 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
     print("Reading noise into memory")
     noise_frames = read_files(noice_files, sampling, frame_length)
 
+    samples_count = 0
+
     bar = Bar('Blending samples', max=len(speech_files))
     for sample_file in speech_files:
         y, _ = librosa.load(sample_file, sr=sampling)
         y = librosa.util.frame(y, frame_length=frame_length,
                                hop_length=frame_length, axis=0)
+        samples_count += y.shape[0]
         filename = os.path.splitext(os.path.basename(sample_file))[0] + ".wav"
         librosa.output.write_wav(os.path.join(
             clean_dir, filename), y.reshape(1, -1)[0], sr=sampling)
@@ -87,10 +75,12 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
         bar.next()
     bar.finish()
 
+    return samples_count
+
 
 def samplify(audio_files: List[str], output_path: str, frame_length: int, sampling: int, npy_samples_count: int):
     """[summary]
-    
+
     Arguments:
         audio_files {List[str]} -- [description]
         output_path {str} -- [description]
@@ -127,7 +117,7 @@ def samplify(audio_files: List[str], output_path: str, frame_length: int, sampli
 
 def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, fft_hop_length: int):
     """[summary]
-    
+
     Arguments:
         samples_npy {List[str]} -- [description]
         spectrogram_out {str} -- [description]

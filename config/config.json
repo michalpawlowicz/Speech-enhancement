@@ -1,0 +1,29 @@
+{
+	"audio_frame_length" : 16384,
+	"sampling" : 16000,
+	"workdir"  : "",
+	"n-fft" : 255,
+	"fft_hop" : 128,
+	"input-size": [128, 128],
+	"generate": {
+		"samplify-npy-size": 3000,
+		"train": {
+			"input_noise" : "",
+			"input_clean" : ""
+		},
+		"test": {
+			"input_noise" : "",
+			"input_clean" : ""
+		}
+	},
+	"train": {
+		"checkpints" : "",
+		"logs" : "",
+		"epoch count" : 0
+	},
+	"predict": {
+		"model": "",
+		"in-predict": "",
+		"out-predict": ""
+	}
+}
