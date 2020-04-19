@@ -3,6 +3,7 @@ from preprocess import create, samplify, spectrogramplify, count_samples
 from sklearn.preprocessing import normalize
 import os
 import librosa
+from typing import Dict
 
 env = check_environment_variables(variables)
 frame_length = int(env["FRAME_LENGTH"])
@@ -11,37 +12,93 @@ samplify_npy_size = int(env["SAMPLIFY_NPY_SIZE"])
 n_fft = int(env["N_FFT"])
 fft_hop_length = int(env["STFT_HOP_LENGTH"])
 
-create(env["INPUT_TRAIN_NOISE"], env["INPUT_TRAIN_CLEAN"],
-       env["TRAIN_NOISY"], env["TRAIN_CLEAN"], frame_length, hop, sampling)
 
-train_clean = [p.path for p in os.scandir(env["TRAIN_CLEAN"])]
-train_clean = sorted(train_clean, key=lambda p: os.path.basename(p))
+def preprocess_data_entry(**kwargs):
+    train_noisy = os.path.join(args["root_dir"], "Train", "noisy")
+    test_noisy = os.path.join(args["root_dir"], "Test", "noisy")
 
-train_noisy = [p.path for p in os.scandir(env["TRAIN_NOISY"])]
-train_noisy = sorted(train_noisy, key=lambda p: os.path.basename(p))
+    train_clean = os.path.join(args["root_dir"], "Train", "clean")
+    test_clean = os.path.join(args["root_dir"], "Test", "clean")
 
-if len(train_clean) != len(train_noisy):
-    raise RuntimeError("Different size!")
+    samplify_train_clean = os.path.join(
+        args["root_dir"], "Train", "samplify", "clean")
+    samplify_test_clean = os.path.join(
+        args["root_dir"], "Test", "samplify", "clean")
 
-for x, y in zip(train_clean, train_noisy):
-    if os.path.basename(x) != os.path.basename(y):
-        raise RuntimeError(
-            "Different sample sets! broke on {0} vs {1}".format(x, y))
+    samplify_train_noisy = os.path.join(
+        args["root_dir"], "Train", "samplify", "noisy")
+    samplify_test_noisy = os.path.join(
+        args["root_dir"], "Test", "samplify", "noisy")
 
-samplify(train_clean, env["SAMPLIFY_TRAIN_CLEAN"],
-         frame_length, hop, sampling, samplify_npy_size)
-samplify(train_noisy, env["SAMPLIFY_TRAIN_NOISY"],
-         frame_length, hop, sampling, samplify_npy_size)
+    spectrogram_train_clean = os.path.join(
+        args["root_dir"], "Train", "spectrogram", "clean")
+    spectrogram_test_clean = os.path.join(
+        args["root_dir"], "Test", "spectrogram", "clean")
 
-samplifiy_train_clean = [
-    p.path for p in os.scandir(env["SAMPLIFY_TRAIN_CLEAN"])]
-samplifiy_train_clean = sorted(samplifiy_train_clean, key=lambda p: int(os.path.basename(p).split('.')[0]))
+    spectrogram_train_noisy = os.path.join(
+        args["root_dir"], "Train", "spectrogram", "noisy")
+    spectrogram_test_noisy = os.path.join(
+        args["root_dir"], "Test", "spectrogram", "noisy")
 
-samplifiy_train_noisy = [
-    p.path for p in os.scandir(env["SAMPLIFY_TRAIN_NOISY"])]
-samplifiy_train_noisy = sorted(samplifiy_train_noisy, key=lambda p: int(os.path.basename(p).split('.')[0]))
+    preprocess_data(env["input_train_noise"], env["input_train_clean"], train_noisy, train_clean, samplify_train_noisy,
+                    samplify_train_clean, spectrogram_train_noisy, spectrogram_train_clean, args["frame_length"], args["sampling"])
 
-spectrogramplify(samplifiy_train_clean,
-                 env["SPECTROGRAM_TRAIN_CLEAN"], n_fft, fft_hop_length)
-spectrogramplify(samplifiy_train_noisy,
-                 env["SPECTROGRAM_TRAIN_NOISY"], n_fft, fft_hop_length)
+    preprocess_data(env["input_test_noise"], env["input_test_clean"], test_noisy, test_clean, samplify_test_noisy,
+                    samplify_test_clean, spectrogram_test_noisy, spectrogram_test_clean, args["frame_length"], args["sampling"])
+
+
+def preprocess_data(input_noise_dir: str, input_clean_dir: str, noisy_audio_dir: str, clean_audio_dir: str, samplify_noisy_dir: str, samplify_clean_dir: str, spectrogramify_clean_dir: str, spectrogramify_noisy_dir: str, frame_length: int, sampling: int):
+    """[summary]
+
+    Arguments:
+        input_noise_dir {str} -- [description]
+        input_clean_dir {str} -- [description]
+        noisy_audio_dir {str} -- [description]
+        clean_audio_dir {str} -- [description]
+        samplify_noisy_dir {str} -- [description]
+        samplify_clean_dir {str} -- [description]
+        spectrogramify_clean_dir {str} -- [description]
+        spectrogramify_noisy_dir {str} -- [description]
+        frame_length {int} -- [description]
+        sampling {int} -- [description]
+
+    Raises:
+        RuntimeError: [description]
+        RuntimeError: [description]
+    """
+
+    create(input_noise_dir, input_clean_dir, noisy_audio_dir,
+           clean_audio_dir, frame_length, sampling)
+
+    clean_audio_paths = sorted(
+        map(lambda entry: entry.path, os.scandir(clean_audio_dir)))
+    noisy_audio_paths = sorted(
+        map(lambda entry: entry.path, os.scandir(noisy_audio_dir)))
+
+    if len(clean_audio_paths) != len(noisy_audio_paths):
+        raise RuntimeError("Different sets size!")
+
+    if any(os.path.basename(x) != os.path.basename(y) for (x, y) in zip(clean_audio_dir, noisy_audio_paths)):
+        raise RuntimeError("Different sample sets!")
+
+    samplify(clean_audio_paths, samplify_clean_dir,
+             frame_length, sampling, samplify_npy_size)
+    samplify(noisy_audio_paths, samplify_noisy_dir,
+             frame_length, sampling, samplify_npy_size)
+
+    samplifiy_clean = sorted(
+        map(lambda entry: entry.path, os.scandir(samplify_clean_dir)))
+    samplifiy_noisy = sorted(
+        map(lambda entry: entry.path, os.scandir(samplify_noisy_dir)))
+
+    spectrogramplify(samplifiy_clean,
+                     spectrogramify_clean_dir, n_fft, fft_hop_length)
+    spectrogramplify(samplifiy_noisy,
+                     spectrogramify_noisy_dir, n_fft, fft_hop_length)
+
+
+# preprocess_data(env["INPUT_TRAIN_NOISE"], env["INPUT_TRAIN_CLEAN"], env["TRAIN_NOISY"], env["TRAIN_CLEAN"], env["SAMPLIFY_TRAIN_NOISY"],
+#                env["SAMPLIFY_TRAIN_CLEAN"], env["SPECTROGRAM_TRAIN_NOISY"], env["SPECTROGRAM_TRAIN_CLEAN"], frame_length, sampling)
+
+preprocess_data(env["INPUT_TEST_NOISE"], env["INPUT_TEST_CLEAN"], env["TEST_NOISY"], env["TEST_CLEAN"], env["SAMPLIFY_TEST_NOISY"],
+                env["SAMPLIFY_TEST_CLEAN"], env["SPECTROGRAM_TEST_NOISY"], env["SPECTROGRAM_TEST_CLEAN"], frame_length, sampling)

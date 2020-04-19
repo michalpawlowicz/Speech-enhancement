@@ -51,7 +51,7 @@ def count_samples(audio_files: List[str], sampling: int, frame_length: int) -> i
     return count
 
 
-def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, frame_length: int, hop: int, sampling: int) -> None:
+def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, frame_length: int, sampling: int) -> None:
     """[summary]
 
     Arguments:
@@ -59,7 +59,6 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
         speech_dir {str} -- [description]
         noisy_dir {str} -- [description]
         frame_length {int} -- [description]
-        hop {int} -- [description]
         sampling {int} -- [description]
     """
     noice_files = list(os.scandir(noise_dir))
@@ -89,7 +88,16 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
     bar.finish()
 
 
-def samplify(audio_files: List[str], output_path: str, frame_length: int, hop: int, sampling: int, npy_samples_count: int):
+def samplify(audio_files: List[str], output_path: str, frame_length: int, sampling: int, npy_samples_count: int):
+    """[summary]
+    
+    Arguments:
+        audio_files {List[str]} -- [description]
+        output_path {str} -- [description]
+        frame_length {int} -- [description]
+        sampling {int} -- [description]
+        npy_samples_count {int} -- [description]
+    """
     npy_frames = []
     npy_idx = 0
     samples_in_npy_frames = 0
@@ -118,6 +126,14 @@ def samplify(audio_files: List[str], output_path: str, frame_length: int, hop: i
 
 
 def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, fft_hop_length: int):
+    """[summary]
+    
+    Arguments:
+        samples_npy {List[str]} -- [description]
+        spectrogram_out {str} -- [description]
+        n_fft {int} -- [description]
+        fft_hop_length {int} -- [description]
+    """
     scaler = MinMaxScaler()
     for idx, samples_path in enumerate(samples_npy):
         print("\nProcessing %s" % samples_path)

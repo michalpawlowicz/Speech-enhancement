@@ -4,6 +4,12 @@ import tensorflow.keras
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
+import os
+
+os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
+
+def predict_entry(**kwargs):
+    pass
 
 env = check_environment_variables(variables)
 

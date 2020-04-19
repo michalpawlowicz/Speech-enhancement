@@ -11,6 +11,9 @@ from typing import List
 # Turn off tensorflow logging
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 
+def train_entry(**kwargs):
+    pass
+
 class Generator(tf.keras.utils.Sequence):
     def __init__(self, x_npy_files: List[str], y_npy_files: List[str], batch_size: int):
         self.batch_size = batch_size
@@ -80,11 +83,11 @@ checkpoint_name = base_name + "-cp-epoch_{epoch:04d}.h5"
 checkpoint_path = os.path.join(
     "/home/michal/Documents/Speech-enhancement/checkpoints", checkpoint_name)
 checkpoint = keras.callbacks.callbacks.ModelCheckpoint(
-    checkpoint_path, verbose=1, monitor='val_loss', save_best_only=False, mode='auto', period=10)
+    checkpoint_path, verbose=1, monitor='val_loss', save_best_only=False, mode='auto', period=1)
 log_dir = "logs/model-{0}-{1}".format(base_name, int(time.time()))
 tensorboard_callback = tf.keras.callbacks.TensorBoard(
     log_dir=log_dir, update_freq='epoch', write_graph=True, profile_batch=0)
 
 model = unet(input_size=(128, 128, 1))
-model.fit_generator(g, epochs=50, shuffle=False, callbacks=[
-                    checkpoint, tensorboard_callback], verbose=1)
+model.fit_generator(g, epochs=50, shuffle=True, callbacks=[
+                    checkpoint, tensorboard_callback], verbose=1, workers=6, use_multiprocessing=True)

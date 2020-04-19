@@ -1,5 +1,9 @@
 import argparse
 import os
+import sys
+from preproces_data import preprocess_data_entry
+from train import train_entry
+from predict import predict_entry
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
@@ -28,15 +32,15 @@ if __name__ == "__main__":
                           type=int, help='Directory to store NN checkpoints during training')
 
     training.add_argument('--batch-size', dest='batch_size',
-                          default="batch_size", type=int, help='Training batch size')
+                          default=64, type=int, help='Training batch size')
 
-    data_generation.add_argument('--input-train-clean', dest='intput_train_clean',
+    data_generation.add_argument('--input-train-clean', dest='input_train_clean',
                                  type=str, help='Directory path to clean speech used as training set')
-    data_generation.add_argument('--input-train-noise', dest='intput_train_noise',
+    data_generation.add_argument('--input-train-noise', dest='input_train_noise',
                                  type=str, help='Directory path to noise used to prepare noisy training set')
-    data_generation.add_argument('--input-test-clean', dest='intput_test_clean',
+    data_generation.add_argument('--input-test-clean', dest='input_test_clean',
                                  type=str, help='Directory path to clean speech used as test set')
-    data_generation.add_argument('--input-test-noise', dest='intput_test',
+    data_generation.add_argument('--input-test-noise', dest='input_test_noise',
                                  type=str, help='Directory path to noise used to prepare noisy test set')
     data_generation.add_argument('--samplify-npy-size', dest='samplify_npy_size', type=int,
                                  help='Number of samples in one generated .npy file, smaller for machines with low ram')
@@ -50,28 +54,27 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    train_noisy = os.path.join(args["root_dir"], "Train", "noisy")
-    test_noisy = os.path.join(args["root_dir"], "Test", "noisy")
+    if args["mode"] not in ["TRAIN", "GENERATE", "PREDICT"]:
+        print("Invalid mode")
+        sys.exit(1)
 
-    train_clean = os.path.join(args["root_dir"], "Train", "clean")
-    test_clean = os.path.join(args["root_dir"], "Test", "clean")
+    def check_parameters(vars):
+        any_missing = False
+        for var in vars:
+            if var not in args:
+                any_missing = True
+                print("Missing parameter: ", var)
+        if any_missing:
+            sys.exit(1)
 
-    samplify_train_clean = os.path.join(
-        args["root_dir"], "Train", "samplify", "clean")
-    samplify_test_clean = os.path.join(
-        args["root_dir"], "Test", "samplify", "clean")
+    if args["mode"] == "GENERATE":
+        check_parameters(["root_dir", "intput_train_clean", "intput_train_noise",
+                          "intput_test_clean", "intput_test_noise", "samplify_npy_size"])
+        preprocess_data_entry(**args)
+    elif args["mode"] == "TRAIN":
+        check_parameters(["batch_size", "root_dir"])
+        train_entry(**args)
+    elif args["mode"] == "PREDICT":
+        check_parameters(["model", "in_predict", "out_predict"])
+        predict_entry(**args)
 
-    samplify_train_noisy = os.path.join(
-        args["root_dir"], "Train", "samplify", "noisy")
-    samplify_test_noisy = os.path.join(
-        args["root_dir"], "Test", "samplify", "noisy")
-
-    spectrogram_train_clean = os.path.join(
-        args["root_dir"], "Train", "spectrogram", "clean")
-    spectrogram_test_clean = os.path.join(
-        args["root_dir"], "Test", "spectrogram", "clean")
-
-    spectrogram_train_noisy = os.path.join(
-        args["root_dir"], "Train", "spectrogram", "noisy")
-    spectrogram_test_noisy = os.path.join(
-        args["root_dir"], "Test", "spectrogram", "noisy")
