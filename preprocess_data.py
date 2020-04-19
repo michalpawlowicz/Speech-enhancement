@@ -100,8 +100,8 @@ def preprocess_data(input_noise_dir: str, input_clean_dir: str, noisy_audio_dir:
                      spectrogramify_noisy_dir, n_fft, fft_hop_length)
 
 
-# preprocess_data(env["INPUT_TRAIN_NOISE"], env["INPUT_TRAIN_CLEAN"], env["TRAIN_NOISY"], env["TRAIN_CLEAN"], env["SAMPLIFY_TRAIN_NOISY"],
-#                env["SAMPLIFY_TRAIN_CLEAN"], env["SPECTROGRAM_TRAIN_NOISY"], env["SPECTROGRAM_TRAIN_CLEAN"], frame_length, sampling)
+preprocess_data(env["INPUT_TRAIN_NOISE"], env["INPUT_TRAIN_CLEAN"], env["TRAIN_NOISY"], env["TRAIN_CLEAN"], env["SAMPLIFY_TRAIN_NOISY"],
+                env["SAMPLIFY_TRAIN_CLEAN"], env["SPECTROGRAM_TRAIN_NOISY"], env["SPECTROGRAM_TRAIN_CLEAN"], frame_length, sampling)
 
 preprocess_data(env["INPUT_TEST_NOISE"], env["INPUT_TEST_CLEAN"], env["TEST_NOISY"], env["TEST_CLEAN"], env["SAMPLIFY_TEST_NOISY"],
                 env["SAMPLIFY_TEST_CLEAN"], env["SPECTROGRAM_TEST_NOISY"], env["SPECTROGRAM_TEST_CLEAN"], frame_length, sampling)

@@ -10,10 +10,9 @@ export CHECKPOINTS_DIR=./checkpoints/
 
 export BATCH_SIZE=64
 
-export ROOT=./"data_nfft_"$N_FFT"_fft_hop_"$STFT_HOP_LENGTH"_frame_length_"$FRAME_LENGTH
+export ROOT=./"data_100_nfft_"$N_FFT"_fft_hop_"$STFT_HOP_LENGTH"_frame_length_"$FRAME_LENGTH
 
-#export INPUT_TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/train-clean-100/
-export INPUT_TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/dev-clean/
+export INPUT_TRAIN_CLEAN=/home/michal/OpenSLR/LibriSpeech/train-clean-100/
 export INPUT_TRAIN_NOISE=/home/michal/ESC-50/ESC-50-master/audio
 
 export INPUT_TEST_CLEAN=/home/michal/OpenSLR/LibriSpeech/test-clean

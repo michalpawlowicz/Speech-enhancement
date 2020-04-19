@@ -96,4 +96,4 @@ tensorboard_callback = tf.keras.callbacks.TensorBoard(
 
 model = unet(input_size=(128, 128, 1))
 model.fit_generator(g, epochs=50, shuffle=True, callbacks=[
-                    checkpoint, tensorboard_callback], verbose=1, workers=6, use_multiprocessing=True, validation_data=g_test, validation_steps=g_test.__len__(), validation_freq=1)
+                    checkpoint, tensorboard_callback], verbose=1, workers=6, use_multiprocessing=True, validation_data=g_test, validation_freq=1)
