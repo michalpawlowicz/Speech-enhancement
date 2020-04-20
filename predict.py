@@ -46,9 +46,9 @@ def predict_entry(**kwargs):
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
+    _ = tf.Session(config=config)
 
-    model = tensorflow.keras.models.load_model(model_path)
+    model = tf.keras.models.load_model(model_path)
 
     Y = model.predict(X)[:, :, :, 0]
 

@@ -27,12 +27,13 @@ if __name__ == "__main__":
         config = json.load(f)
 
     if args["train"]:
-        args = {"workdir": config["workdir"],
-                "logs": config["logs"],
-                "checkpoints": config["checkpoints"],
-                "epochs": config["epochs"],
-                "input_size": config["input_size"]
-                }
+        args = {
+            "workdir": config["workdir"],
+            "logs": config["logs"],
+            "checkpoints": config["checkpoints"],
+            "epochs": config["epochs"],
+            "input_size": config["input_size"]
+        }
         train_entry(**args)
     elif args["gen"]:
         args = {
@@ -47,4 +48,13 @@ if __name__ == "__main__":
         }
         preprocess_data_entry(**args)
     elif args["pred"]:
+        args = {
+            "sampling": config["sampling"],
+            "frame_length": config["frame_length"],
+            "model_path": config["model"],
+            "n_fft": config["n_fft"],
+            "fft_hop_length": config["fft_hop_length"],
+            "in_audio_path": config["pred_in_audio"],
+            "out_audio_path": config["pred_out_audio"]
+        }
         predict_entry(**args)
