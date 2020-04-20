@@ -2,11 +2,11 @@
 	"audio_frame_length" : 16384,
 	"sampling" : 16000,
 	"workdir"  : "",
-	"n-fft" : 255,
+	"n_fft" : 255,
 	"fft_hop" : 128,
-	"input-size": [128, 128],
+	"input_size": [128, 128],
 	"generate": {
-		"samplify-npy-size": 3000,
+		"samplify_npy_size": 3000,
 		"train": {
 			"input_noise" : "",
 			"input_clean" : ""
@@ -23,7 +23,7 @@
 	},
 	"predict": {
 		"model": "",
-		"in-predict": "",
-		"out-predict": ""
+		"in_predict": "",
+		"out_predict": ""
 	}
 }

@@ -1,4 +1,3 @@
-from environment import check_environment_variables, variables
 from preprocess import create, samplify, spectrogramplify
 from sklearn.preprocessing import normalize
 from typing import Tuple
@@ -10,6 +9,9 @@ def preprocess_data_entry(**kwargs) -> Tuple[int, int]:
     sampling = kwargs["sampling"]
     frame_length = kwargs["frame_length"]
     workdir = kwargs["workdir"]
+    n_fft = kwargs["n_fft"]
+    fft_hop_length = kwargs["fft_hop_length"]
+    samplify_npy_size = kwargs["samplify_npy_size"]
 
     train_noisy = os.path.join(workdir, "Train", "noisy")
     test_noisy = os.path.join(workdir, "Test", "noisy")
@@ -38,15 +40,20 @@ def preprocess_data_entry(**kwargs) -> Tuple[int, int]:
         workdir, "Test", "spectrogram", "noisy")
 
     train_samples_count = preprocess_data(kwargs["train"]["input_noise"], kwargs["train"]["input_clean"], train_noisy, train_clean, samplify_train_noisy,
-                                          samplify_train_clean, spectrogram_train_noisy, spectrogram_train_clean, frame_length, sampling)
+                                          samplify_train_clean, spectrogram_train_noisy, spectrogram_train_clean, frame_length, sampling, samplify_npy_size, n_fft, fft_hop_length)
 
     test_samples_count = preprocess_data(kwargs["test"]["input_noise"], kwargs["test"]["input_clean"], test_noisy, test_clean, samplify_test_noisy,
-                                         samplify_test_clean, spectrogram_test_noisy, spectrogram_test_clean, frame_length, sampling)
+                                         samplify_test_clean, spectrogram_test_noisy, spectrogram_test_clean, frame_length, sampling, samplify_npy_size, n_fft, fft_hop_length)
 
     return train_samples_count, test_samples_count
 
 
-def preprocess_data(input_noise_dir: str, input_clean_dir: str, noisy_audio_dir: str, clean_audio_dir: str, samplify_noisy_dir: str, samplify_clean_dir: str, spectrogramify_clean_dir: str, spectrogramify_noisy_dir: str, frame_length: int, sampling: int) -> int:
+def preprocess_data(input_noise_dir: str, input_clean_dir: str,
+                    noisy_audio_dir: str, clean_audio_dir: str,
+                    samplify_noisy_dir: str, samplify_clean_dir: str,
+                    spectrogramify_clean_dir: str, spectrogramify_noisy_dir: str,
+                    frame_length: int, sampling: int, samplify_npy_size: int,
+                    n_fft: int, fft_hop_length: int) -> int:
     """[summary]
 
     Arguments:
@@ -60,6 +67,9 @@ def preprocess_data(input_noise_dir: str, input_clean_dir: str, noisy_audio_dir:
         spectrogramify_noisy_dir {str} -- [description]
         frame_length {int} -- [description]
         sampling {int} -- [description]
+        samplify_npy_size {int} -- [description]
+        n_fft {int} -- [description]
+        fft_hop_length {int} -- [description]
 
     Raises:
         RuntimeError: [description]
@@ -99,20 +109,3 @@ def preprocess_data(input_noise_dir: str, input_clean_dir: str, noisy_audio_dir:
                      spectrogramify_noisy_dir, n_fft, fft_hop_length)
 
     return samples_count
-
-
-"""
-env = check_environment_variables(variables)
-frame_length = int(env["FRAME_LENGTH"])
-sampling = int(env["SAMPLING"])
-samplify_npy_size = int(env["SAMPLIFY_NPY_SIZE"])
-n_fft = int(env["N_FFT"])
-fft_hop_length = int(env["STFT_HOP_LENGTH"])
-
-train_samples_count = preprocess_data(env["INPUT_TRAIN_NOISE"], env["INPUT_TRAIN_CLEAN"], env["TRAIN_NOISY"], env["TRAIN_CLEAN"], env["SAMPLIFY_TRAIN_NOISY"],
-                                      env["SAMPLIFY_TRAIN_CLEAN"], env["SPECTROGRAM_TRAIN_NOISY"], env["SPECTROGRAM_TRAIN_CLEAN"], frame_length, sampling)
-
-test_samples_count = preprocess_data(env["INPUT_TEST_NOISE"], env["INPUT_TEST_CLEAN"], env["TEST_NOISY"], env["TEST_CLEAN"], env["SAMPLIFY_TEST_NOISY"],
-                                     env["SAMPLIFY_TEST_CLEAN"], env["SPECTROGRAM_TEST_NOISY"], env["SPECTROGRAM_TEST_CLEAN"], frame_length, sampling)
-
-"""

@@ -1,5 +1,6 @@
 import argparse
 import sys
+import json
 
 from preprocess_data import preprocess_data_entry
 from train import train_entry
@@ -7,63 +8,43 @@ from predict import predict_entry
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
-
     required = parser.add_argument_group('Required arguments')
-    training = parser.add_argument_group('Training')
-    data_generation = parser.add_argument_group('Data generation')
-    prediction = parser.add_argument_group('Prediction')
-    optional = parser.add_argument_group("Optional")
-
-    required.add_argument("--mode", dest="mode", type=str, required=True,
-                          help="run in one of three modes [TRAIN | GENERATE | PREDICT]")
-
-    optional.add_argument('--sampling', dest='sampling', default=16000,
-                          type=int, help='Audio sampling, default 16000')
-    optional.add_argument('--frame-length', dest='frame_length', default=16384,
-                          type=int, help='Length of audio passed to NN, default=16384')
-    optional.add_argument('--n-fft', dest='n_fft', type=int, default=255,
-                          help='n_fft parameter passed to stft, default=255')
-    optional.add_argument('--fft-hop', dest='fft_hop', default=128,
-                          type=int, help='hop parameter passed to stft, default=128')
-    optional.add_argument('--root-dir', dest='root_dir', default="./data", type=str,
-                          help='Working directory for storing prepared samples, it should be empty directory, default=./data')
-
-    optional.add_argument('--checkpoints-dir', dest='checkpoints_dir',
-                          type=int, help='Directory to store NN checkpoints during training')
-
-    optional.add_argument('--tensorboard-logs-dir', dest='tensorboard_logs_dir',
-                          default=None, type=str, help="Directory to store tensorboard logs")
-
-    training.add_argument('--batch-size', dest='batch_size',
-                          default=64, type=int, help='Training batch size')
-
-    data_generation.add_argument('--input-train-clean', dest='input_train_clean',
-                                 type=str, help='Directory path to clean speech used as training set')
-    data_generation.add_argument('--input-train-noise', dest='input_train_noise',
-                                 type=str, help='Directory path to noise used to prepare noisy training set')
-    data_generation.add_argument('--input-test-clean', dest='input_test_clean',
-                                 type=str, help='Directory path to clean speech used as test set')
-    data_generation.add_argument('--input-test-noise', dest='input_test_noise',
-                                 type=str, help='Directory path to noise used to prepare noisy test set')
-    data_generation.add_argument('--samplify-npy-size', dest='samplify_npy_size', type=int,
-                                 help='Number of samples in one generated .npy file, smaller for machines with low ram')
-
-    prediction.add_argument('--model', dest='model', type=str,
-                            help='Path to model\'s weight when pretrained is used')
-    prediction.add_argument('--in-predict', dest='in_predict',
-                            type=str, help='Audio path to be denoised')
-    prediction.add_argument('--out-predict', dest='out_predict', type=str,
-                            help='Path where denoised audio should be saved, path with file name')
-
+    required.add_argument("--train", dest="train", type=bool,
+                          required=False, default=False, help="Start training")
+    required.add_argument("--gen", dest="gen", type=bool,
+                          required=False, default=False, help="Generate data")
+    required.add_argument("--pred", dest="pred", type=bool,
+                          required=False, default=False, help="Denoise input audio")
+    required.add_argument("--config", dest="config", type=str,
+                          required=True, help="Use given config file")
     args = parser.parse_args()
 
-    if args["mode"] not in ["TRAIN", "GENERATE", "PREDICT"]:
-        print("Invalid mode")
+    if len(filter(lambda x: x, [args["train"], args["gen"], args["pred"]])) != 1:
+        parser.print_help()
         sys.exit(1)
 
-    if args["mode"] == "GENERATE":
-        preprocess_data_entry(**args)
-    elif args["mode"] == "TRAIN":
+    with open(args["config"], 'r') as f:
+        config = json.load(f)
+
+    if args["train"]:
+        args = {"workdir": config["workdir"],
+                "logs": config["logs"],
+                "checkpoints": config["checkpoints"],
+                "epochs": config["epochs"],
+                "input_size": config["input_size"]
+                }
         train_entry(**args)
-    elif args["mode"] == "PREDICT":
+    elif args["gen"]:
+        args = {
+            "sampling": config["sampling"],
+            "frame_length": config["frame_length"],
+            "workdir": config["workdir"],
+            "n_fft": config["n_fft"],
+            "fft_hop_length": config["fft_hop_length"],
+            "samplify_npy_size": config["samplify_npy_size"],
+            "train": config["train"],
+            "test": config["test"]
+        }
+        preprocess_data_entry(**args)
+    elif args["pred"]:
         predict_entry(**args)

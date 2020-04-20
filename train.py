@@ -108,12 +108,3 @@ class Generator(tf.keras.utils.Sequence):
 
         self.x_generator = lazy_numpy_vstack(self.x_samples_list)
         self.y_generator = lazy_numpy_vstack(self.y_samples_list)
-
-
-args = {"workdir": os.environ["ROOT"],
-        "logs": "logs/",
-        "checkpoints": "checkpoints/",
-        "epochs": 128,
-        "input_size": (128, 128, 1)}
-
-train_entry(**args)
