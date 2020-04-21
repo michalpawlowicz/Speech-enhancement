@@ -24,6 +24,9 @@ def build_env(workdir):
     os.makedirs(os.path.join(workdir, "Test", "spectrogram", "clean"))
     os.makedirs(os.path.join(workdir, "Test", "spectrogram", "noisy"))
 
+    os.makedirs(os.path.join(workdir, "checkpoints"))
+    os.makedirs(os.path.join(workdir, "logs"))
+
 
 def config_preproces(config):
     def _preprocess(config, workdir):
@@ -62,15 +65,13 @@ if __name__ == "__main__":
         config = json.load(f)
     config = config_preproces(config)
 
-    print(config)
-
     if args.train:
         args = {
             "workdir": config["workdir"],
-            "logs": config["logs"],
-            "checkpoints": config["checkpoints"],
-            "epochs": config["epochs"],
-            "input_size": config["input_size"]
+            "logs": config["train"]["logs"],
+            "checkpoints": config["train"]["checkpoints"],
+            "epochs": config["train"]["epochs"],
+            "input_size": (config["input_size"][0], config["input_size"][1], 1)
         }
         train_entry(**args)
     elif args.gen:

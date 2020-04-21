@@ -1,29 +1,29 @@
 {
 	"frame_length" : 16384,
 	"sampling" : 16000,
-	"workdir"  : "",
+	"workdir"  : "data/",
 	"n_fft" : 255,
 	"fft_hop_length" : 128,
 	"input_size": [128, 128],
 	"generate": {
 		"samplify_npy_size": 3000,
 		"train": {
-			"input_noise" : "",
-			"input_clean" : ""
+			"input_noise" : "/home/ESC-50/ESC-50-master/audio",
+			"input_clean" : "/home/OpenSLR/LibriSpeech/dev-clean/"
 		},
 		"test": {
-			"input_noise" : "",
-			"input_clean" : ""
+			"input_noise" : "/home/ESC-50/ESC-50-master/audio",
+			"input_clean" : "/home/OpenSLR/LibriSpeech/test-clean"
 		}
 	},
 	"train": {
-		"checkpints" : "",
-		"logs" : "",
-		"epoch count" : 0
+		"checkpoints" : "{workdir}/checkpoints/",
+		"logs" : "logs/",
+		"epochs" : 64
 	},
 	"predict": {
-		"model": "",
-		"in_predict": "",
-		"out_predict": ""
+		"model": "{workdir}/checkpoints/best.h5",
+		"in_predict": "{workdir}/noisy.wav",
+		"out_predict": "{workdir}/predicted.wav"
 	}
 }
