@@ -1,9 +1,9 @@
 {
-	"audio_frame_length" : 16384,
+	"frame_length" : 16384,
 	"sampling" : 16000,
 	"workdir"  : "",
 	"n_fft" : 255,
-	"fft_hop" : 128,
+	"fft_hop_length" : 128,
 	"input_size": [128, 128],
 	"generate": {
 		"samplify_npy_size": 3000,

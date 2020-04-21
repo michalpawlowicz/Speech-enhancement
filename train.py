@@ -3,7 +3,6 @@ import numpy as np
 import tensorflow as tf
 import time
 import keras
-from environment import check_environment_variables, variables
 from model import get_unet, unet
 from typing import List
 
@@ -76,14 +75,14 @@ class Generator(tf.keras.utils.Sequence):
         self.x_npy_files = x_npy_files
         self.y_npy_files = y_npy_files
 
-        self.on_each_epoch()
+        self._on_each_epoch()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return int(np.floor(self.sample_count / self.batch_size))
 
     def __getitem__(self, index):
         if index == 0:
-            self.on_each_epoch()
+            self._on_each_epoch()
         x_batch = []
         y_batch = []
         for _ in range(0, self.batch_size):
@@ -91,7 +90,7 @@ class Generator(tf.keras.utils.Sequence):
             y_batch.append(next(self.y_generator))
         return np.array(x_batch), np.array(y_batch)
 
-    def on_each_epoch(self):
+    def _on_each_epoch(self):
         self.x_samples_list = map(
             lambda npy_file: np.load(npy_file), self.x_npy_files)
         self.x_samples_list = map(lambda m: m.reshape(

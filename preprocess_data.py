@@ -5,7 +5,7 @@ import os
 import librosa
 
 
-def preprocess_data_entry(**kwargs) -> Tuple[int, int]:
+def preprocess_data_entry(**kwargs):
     sampling = kwargs["sampling"]
     frame_length = kwargs["frame_length"]
     workdir = kwargs["workdir"]
