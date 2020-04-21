@@ -71,6 +71,7 @@ if __name__ == "__main__":
             "logs": config["train"]["logs"],
             "checkpoints": config["train"]["checkpoints"],
             "epochs": config["train"]["epochs"],
+            "batch_size": config["train"]["batch_size"],
             "input_size": (config["input_size"][0], config["input_size"][1], 1)
         }
         train_entry(**args)

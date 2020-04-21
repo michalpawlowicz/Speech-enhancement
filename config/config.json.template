@@ -19,7 +19,8 @@
 	"train": {
 		"checkpoints" : "{workdir}/checkpoints/",
 		"logs" : "logs/",
-		"epochs" : 64
+		"epochs" : 100,
+		"batch_size" : 64
 	},
 	"predict": {
 		"model": "{workdir}/checkpoints/best.h5",

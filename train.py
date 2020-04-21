@@ -15,6 +15,7 @@ def train_entry(**kwargs):
     log_dir = kwargs["logs"]
     checkpoint_dir = kwargs["checkpoints"]
     epochs = kwargs["epochs"]
+    batch_size = kwargs["batch_size"]
     input_size = kwargs["input_size"]
 
     spectrogram_train_clean = os.path.join(
@@ -37,8 +38,8 @@ def train_entry(**kwargs):
     y_test_paths = sorted(map(lambda direntry: direntry.path,
                               os.scandir(spectrogram_test_clean)))
 
-    train_generator = Generator(X_paths, y_paths, epochs)
-    test_generator = Generator(X_test_paths, y_test_paths, epochs)
+    train_generator = Generator(X_paths, y_paths, batch_size=batch_size)
+    test_generator = Generator(X_test_paths, y_test_paths, batch_size=batch_size)
 
     config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
