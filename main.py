@@ -31,10 +31,10 @@ def build_env(workdir):
 def config_preproces(config):
     def _preprocess(config, workdir):
         for (key, val) in config.items():
-            if type(val) is str:
+            if isinstance(val, str):
                 config[key] = os.path.normpath(
                     val.replace("{workdir}", workdir))
-            elif type(val) is dict:
+            elif isinstance(val, dict):
                 config[key] = _preprocess(val, workdir)
         return config
     arr = config['input_size']
