@@ -91,13 +91,11 @@ class Generator(tf.keras.utils.Sequence):
         return np.array(x_batch), np.array(y_batch)
 
     def _on_each_epoch(self):
-        self.x_samples_list = map(
-            lambda npy_file: np.load(npy_file), self.x_npy_files)
+        self.x_samples_list = map(np.load, self.x_npy_files)
         self.x_samples_list = map(lambda m: m.reshape(
             m.shape[0], m.shape[1], m.shape[2], 1), self.x_samples_list)
 
-        self.y_samples_list = map(
-            lambda npy_file: np.load(npy_file), self.y_npy_files)
+        self.y_samples_list = map(np.load, self.y_npy_files)
         self.y_samples_list = map(lambda m: m.reshape(
             m.shape[0], m.shape[1], m.shape[2], 1), self.y_samples_list)
 
