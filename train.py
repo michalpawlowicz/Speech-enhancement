@@ -17,6 +17,7 @@ def train_entry(**kwargs):
     epochs = kwargs["epochs"]
     batch_size = kwargs["batch_size"]
     input_size = kwargs["input_size"]
+    validate = kwargs["validate"]
 
     spectrogram_train_clean = os.path.join(
         workdir, "Train", "spectrogram", "clean")
@@ -39,7 +40,7 @@ def train_entry(**kwargs):
                               os.scandir(spectrogram_test_clean)))
 
     train_generator = Generator(X_paths, y_paths, batch_size=batch_size)
-    test_generator = Generator(X_test_paths, y_test_paths, batch_size=batch_size)
+    test_generator = Generator(X_test_paths, y_test_paths, batch_size=batch_size) if validate else None
 
     config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -58,6 +59,8 @@ def train_entry(**kwargs):
         checkpoint = keras.callbacks.callbacks.ModelCheckpoint(
             path, verbose=1, monitor='val_loss', save_best_only=True, mode='auto', period=1)
         callbacks.append(checkpoint)
+
+    
 
     model = unet(input_size=input_size)
     model.fit_generator(train_generator, epochs=epochs, shuffle=True, callbacks=callbacks, verbose=1,

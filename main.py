@@ -72,7 +72,8 @@ if __name__ == "__main__":
             "checkpoints": config["train"]["checkpoints"],
             "epochs": config["train"]["epochs"],
             "batch_size": config["train"]["batch_size"],
-            "input_size": (config["input_size"][0], config["input_size"][1], 1)
+            "input_size": (config["input_size"][0], config["input_size"][1], 1),
+            "validate": config["train"]["validate"]
         }
         train_entry(**args)
     elif args.gen:

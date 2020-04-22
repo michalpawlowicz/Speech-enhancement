@@ -20,7 +20,8 @@
 		"checkpoints" : "{workdir}/checkpoints/",
 		"logs" : "logs/",
 		"epochs" : 100,
-		"batch_size" : 64
+		"batch_size" : 64,
+		"validate" : true
 	},
 	"predict": {
 		"model": "{workdir}/checkpoints/best.h5",

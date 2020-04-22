@@ -124,7 +124,6 @@ def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, f
         n_fft {int} -- [description]
         fft_hop_length {int} -- [description]
     """
-    scaler = MinMaxScaler()
     for idx, samples_path in enumerate(samples_npy):
         print("\nProcessing %s" % samples_path)
         samples = np.load(samples_path)
@@ -133,12 +132,13 @@ def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, f
         for sample in samples:
             magnitude, _ = librosa.magphase(librosa.stft(
                 sample, n_fft=n_fft, hop_length=fft_hop_length))
-            spectrogram = librosa.amplitude_to_db(magnitude, ref=np.max)
-            scaler.fit(spectrogram)
-            spectrogram = scaler.transform(spectrogram)
-            spectrograms.append(spectrogram)
+            spectrograms.append(librosa.amplitude_to_db(magnitude, ref=np.max))
             bar.next()
         output = os.path.join(spectrogram_out, "{}.npy".format(idx))
         print("\nWriting spectrograms to %s" % output)
+
+        spectrograms = np.array(spectrograms)
+        spectrograms = (spectrograms - np.min(spectrograms)) / (np.max(spectrograms) - np.min(spectrograms))
+
         save(output, np.array(spectrograms))
         bar.finish()
