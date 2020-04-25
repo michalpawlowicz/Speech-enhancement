@@ -3,7 +3,7 @@
 	"sampling" : 16000,
 	"workdir"  : "data/",
 	"n_fft" : 255,
-	"fft_hop_length" : 128,
+	"fft_hop_length" : 256,
 	"input_size": [128, 128],
 	"generate": {
 		"samplify_npy_size": 10000,
