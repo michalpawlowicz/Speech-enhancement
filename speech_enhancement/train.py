@@ -4,6 +4,7 @@ import tensorflow as tf
 import time
 from speech_enhancement.model import get_unet, unet
 from typing import List
+import random
 
 # Turn off tensorflow logging
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -19,6 +20,7 @@ def train_entry(**kwargs):
     validate = kwargs["validate"]
     loss = kwargs["loss"]
     optimizer = kwargs["optimizer"]
+    shuffle = kwargs["shuffle"]
 
     spectrogram_train_clean = os.path.join(
         workdir, "Train", "spectrogram", "clean")
@@ -40,8 +42,10 @@ def train_entry(**kwargs):
     y_test_paths = sorted(map(lambda direntry: direntry.path,
                               os.scandir(spectrogram_test_clean)))
 
-    train_generator = Generator(X_paths, y_paths, batch_size=batch_size)
-    test_generator = Generator(X_test_paths, y_test_paths, batch_size=batch_size) if validate else None
+    train_generator = Generator(
+        X_paths, y_paths, batch_size=batch_size, shuffle=shuffle)
+    test_generator = Generator(
+        X_test_paths, y_test_paths, batch_size=batch_size, shuffle=shuffle) if validate else None
 
     config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -61,15 +65,16 @@ def train_entry(**kwargs):
             path, verbose=1, monitor='val_loss', save_best_only=False, mode='auto', period=1)
         callbacks.append(checkpoint)
 
-    
-    model = unet(input_size=input_size, loss=loss, optimizer=optimizer["name"], lr=optimizer["lr"])
+    model = unet(input_size=input_size, loss=loss,
+                 optimizer=optimizer["name"], lr=optimizer["lr"])
     model.fit_generator(train_generator, epochs=epochs, shuffle=False, callbacks=callbacks, verbose=1,
-                        workers=1, use_multiprocessing=False, validation_data=test_generator, validation_freq=1)
+                        workers=1, use_multiprocessing=True, validation_data=test_generator, validation_freq=1)
 
 
 class Generator(tf.keras.utils.Sequence):
-    def __init__(self, x_npy_files: List[str], y_npy_files: List[str], batch_size: int):
+    def __init__(self, x_npy_files: List[str], y_npy_files: List[str], batch_size: int, shuffle: bool = False):
         self.batch_size = batch_size
+        self.shuffle = shuffle
 
         self.sample_count = 0
         for npy_file in x_npy_files:
@@ -92,6 +97,12 @@ class Generator(tf.keras.utils.Sequence):
         for _ in range(0, self.batch_size):
             x_batch.append(next(self.x_generator))
             y_batch.append(next(self.y_generator))
+        if self.shuffle:
+            indexes = list(range(0, len(x_batch)))
+            random.shuffle(indexes)
+            for i, j in enumerate(indexes):
+                x_batch[i], x_batch[j] = x_batch[j], x_batch[i]
+                y_batch[i], y_batch[j] = y_batch[j], y_batch[i]
         return np.array(x_batch), np.array(y_batch)
 
     def _on_each_epoch(self):

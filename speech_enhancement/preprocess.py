@@ -9,7 +9,7 @@ import math
 from sklearn.preprocessing import MinMaxScaler
 
 
-def read_files(audio_files: List[str], sampling: int, frame_length: int) -> np.ndarray:
+def read_files(audio_files: List[str], sampling: int, frame_length: int, hop_length: int) -> np.ndarray:
     """[summary]
 
     Arguments:
@@ -26,7 +26,7 @@ def read_files(audio_files: List[str], sampling: int, frame_length: int) -> np.n
     for f in audio_files:
         y, _ = librosa.load(f, sr=sampling)
         audio_stacks.append(librosa.util.frame(
-            y, frame_length=frame_length, hop_length=frame_length, axis=0))
+            y, frame_length=frame_length, hop_length=hop_length, axis=0))
         bar.next()
     bar.finish()
     return np.vstack(audio_stacks)
@@ -53,7 +53,7 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
     random.shuffle(speech_files)
 
     print("Reading noise into memory")
-    noise_frames = read_files(noice_files, sampling, frame_length)
+    noise_frames = read_files(noice_files, sampling, frame_length, int(frame_length * 0.3))
 
     samples_count = 0
 
@@ -95,7 +95,7 @@ def samplify(audio_files: List[str], output_path: str, frame_length: int, sampli
     for audio_file in audio_files:
         y, _ = librosa.load(audio_file, sr=sampling)
         frames = librosa.util.frame(
-            y, frame_length=frame_length, hop_length=frame_length, axis=0)
+            y, frame_length=frame_length, hop_length=int(frame_length * 0.3), axis=0)
         samples_in_npy_frames += frames.shape[0]
         npy_frames.append(frames)
         if samples_in_npy_frames > npy_samples_count:

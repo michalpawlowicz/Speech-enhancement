@@ -26,9 +26,11 @@ def predict_entry(**kwargs):
     _ = tf.Session(config=config)
 
     for in_audio_path, out_audio_path in zip(in_audio_path_v, out_audio_path_v):
-        y, _ = librosa.load(in_audio_path, sr=sampling)
+        audio_y, _ = librosa.load(in_audio_path, sr=sampling)
         frames = librosa.util.frame(
-            y, frame_length=frame_length, hop_length=frame_length, axis=0)
+            audio_y, frame_length=frame_length, hop_length=frame_length, axis=0)
+
+        audio_y = frames.reshape(1, -1)
 
         X = []
         phases = []
@@ -60,5 +62,6 @@ def predict_entry(**kwargs):
             audio[i, :] = magnitude_db_and_phase_to_audio(
                 frame_length, fft_hop_length, y, p)
 
-        audio = audio.reshape(1, -1)
+        audio = audio_y - audio.reshape(1, -1)
+        #audio = audio.reshape(1, -1)
         librosa.output.write_wav(out_audio_path, audio[0], sampling, norm=True)

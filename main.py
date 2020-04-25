@@ -81,7 +81,8 @@ if __name__ == "__main__":
             "input_size": (config["input_size"][0], config["input_size"][1], 1),
             "validate": config["train"]["validate"],
             "optimizer": config["train"]["optimizer"],
-            "loss": config["train"]["loss"]
+            "loss": config["train"]["loss"],
+            "shuffle": config["train"]["shuffle"] if "shuffle" in config["train"] else False
         }
         train_entry(**args)
     elif args.gen:
