@@ -2,7 +2,6 @@ import os
 import numpy as np
 import tensorflow as tf
 import time
-import keras
 from speech_enhancement.model import get_unet, unet
 from typing import List
 
@@ -58,7 +57,7 @@ def train_entry(**kwargs):
     if checkpoint_dir is not None:
         name = "model-cp-epoch_{epoch:04d}.h5"
         path = os.path.join(checkpoint_dir, name)
-        checkpoint = keras.callbacks.callbacks.ModelCheckpoint(
+        checkpoint = tf.keras.callbacks.ModelCheckpoint(
             path, verbose=1, monitor='val_loss', save_best_only=False, mode='auto', period=1)
         callbacks.append(checkpoint)
 
