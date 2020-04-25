@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 import time
 import keras
-from model import get_unet, unet
+from speech_enhancement.model import get_unet, unet
 from typing import List
 
 # Turn off tensorflow logging
@@ -18,6 +18,8 @@ def train_entry(**kwargs):
     batch_size = kwargs["batch_size"]
     input_size = kwargs["input_size"]
     validate = kwargs["validate"]
+    loss = kwargs["loss"]
+    optimizer = kwargs["optimizer"]
 
     spectrogram_train_clean = os.path.join(
         workdir, "Train", "spectrogram", "clean")
@@ -57,14 +59,13 @@ def train_entry(**kwargs):
         name = "model-cp-epoch_{epoch:04d}.h5"
         path = os.path.join(checkpoint_dir, name)
         checkpoint = keras.callbacks.callbacks.ModelCheckpoint(
-            path, verbose=1, monitor='val_loss', save_best_only=True, mode='auto', period=1)
+            path, verbose=1, monitor='val_loss', save_best_only=False, mode='auto', period=1)
         callbacks.append(checkpoint)
 
     
-
-    model = unet(input_size=input_size)
-    model.fit_generator(train_generator, epochs=epochs, shuffle=True, callbacks=callbacks, verbose=1,
-                        workers=6, use_multiprocessing=True, validation_data=test_generator, validation_freq=1)
+    model = unet(input_size=input_size, loss=loss, optimizer=optimizer["name"], lr=optimizer["lr"])
+    model.fit_generator(train_generator, epochs=epochs, shuffle=False, callbacks=callbacks, verbose=1,
+                        workers=1, use_multiprocessing=False, validation_data=test_generator, validation_freq=1)
 
 
 class Generator(tf.keras.utils.Sequence):

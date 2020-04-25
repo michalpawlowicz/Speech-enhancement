@@ -117,7 +117,7 @@ def unet(pretrained_weights = None,input_size = (128,128,1), loss='mean_absolute
     if optimizer == 'adam':
         optimizer = tf.keras.optimizers.Adam(lr=lr)
     elif optimizer == 'sgd':
-        optimizer = tf.keras.optimizers.SGD(lr=lr, momentum=0.0)
+        optimizer = tf.keras.optimizers.SGD(lr=lr)
     else:
         raise RuntimeError("Unknown optimizer")
 

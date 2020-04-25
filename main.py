@@ -3,9 +3,9 @@ import sys
 import json
 import os
 
-from preprocess_data import preprocess_data_entry
-from train import train_entry
-from predict import predict_entry
+from speech_enhancement.preprocess_data import preprocess_data_entry
+from speech_enhancement.train import train_entry
+from speech_enhancement.predict import predict_entry
 
 
 def build_env(workdir):

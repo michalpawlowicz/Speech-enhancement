@@ -1,4 +1,4 @@
-from preprocess import create, samplify, spectrogramplify
+from speech_enhancement.preprocess import create, samplify, spectrogramplify
 from sklearn.preprocessing import normalize
 from typing import Tuple
 import os
