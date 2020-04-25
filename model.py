@@ -5,33 +5,30 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import backend
 import tensorflow as tf
 
-def unet_layer(inputs, filters):
-    x = Conv2D(filters=filters, padding="same", kernel_size=(3, 3), kernel_initializer="he_normal")(inputs)
-    x = Activation('relu')(x)
-    x = Conv2D(filters=filters, padding="same", kernel_size=(3, 3), kernel_initializer="he_normal")(x)
-    x = Activation('relu')(x)
+def unet_layer(inputs, filters, dilation=1):
+    x = Conv2D(filters=filters, padding="same", kernel_size=(3, 3), kernel_initializer="he_normal", activation='relu', dilation_rate=dilation)(inputs)
+    x = Conv2D(filters=filters, padding="same", kernel_size=(3, 3), kernel_initializer="he_normal", activation='relu')(x)
     return x
 
 
 def get_unet(input_size = (128,128,1)):
     filter_size = 16
     dropout = 0.1
-
     inputs = Input(input_size)
 
-    l1 = unet_layer(inputs, filter_size * 1)
+    l1 = unet_layer(inputs, filter_size * 1, dilation=1)
     p1 = MaxPooling2D((2, 2), padding='same')(l1)
     p1 = Dropout(dropout)(p1)
 
-    l2 = unet_layer(p1, filter_size * 2)
+    l2 = unet_layer(p1, filter_size * 2, dilation=2)
     p2 = MaxPooling2D((2, 2), padding='same')(l2)
     p2 = Dropout(dropout)(p2)
 
-    l3 = unet_layer(p2, filter_size * 4)
+    l3 = unet_layer(p2, filter_size * 4, dilation=4)
     p3 = MaxPooling2D((2, 2), padding='same')(l3)
     p3 = Dropout(dropout)(p3)
 
-    l4 = unet_layer(p3, filter_size * 8)
+    l4 = unet_layer(p3, filter_size * 8, dilation=8)
 
     u1 = Conv2DTranspose(filter_size * 4, kernel_size=(3, 3), strides = (2, 2), padding = 'same')(l4)
     u2 = Conv2DTranspose(filter_size * 2, kernel_size=(3, 3), strides = (2, 2), padding = 'same')(u1)
@@ -39,13 +36,14 @@ def get_unet(input_size = (128,128,1)):
     u4 = Conv2D(1, kernel_size=(1, 1), strides = (1, 1), padding = 'same')(u3)
 
     model = Model(inputs, u4)
-    model.compile(optimizer = 'adam', loss = tf.keras.losses.Huber(), metrics = ['mae'])
-    model.summary()
+    optimizer = tf.keras.optimizers.Adam(lr=0.0001)
+    model.compile(optimizer=optimizer, loss='mean_absolute_error', metrics=['mae'])
+    #model.summary()
     return model
 
 
 #Unet network
-def unet(pretrained_weights = None,input_size = (128,128,1)):
+def unet(pretrained_weights = None,input_size = (128,128,1), loss='mean_absolute_error', optimizer='adam', lr=0.0001):
     #size filter input
     size_filter_in = 16
     #normal initialization of weights
@@ -115,8 +113,15 @@ def unet(pretrained_weights = None,input_size = (128,128,1)):
     conv10 = Conv2D(1, 1, activation = 'tanh')(conv9)
 
     model = Model(inputs,conv10)
+    
+    if optimizer == 'adam':
+        optimizer = tf.keras.optimizers.Adam(lr=lr)
+    elif optimizer == 'sgd':
+        optimizer = tf.keras.optimizers.SGD(lr=lr, momentum=0.0)
+    else:
+        raise RuntimeError("Unknown optimizer")
 
-    model.compile(optimizer = 'adam', loss = tf.keras.losses.Huber(), metrics = ['mae'])
+    model.compile(optimizer=optimizer, loss=loss, metrics=['mae'])
     #model.summary()
 
     return model

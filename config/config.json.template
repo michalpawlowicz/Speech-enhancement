@@ -24,7 +24,11 @@
 		"batch_size" : 64,
 		"validate" : true,
         "loss": "tf.keras.losses.Huber",
-        "optimiser": "adam"
+        "optimizer": {
+            "name": "sgd",
+            "lr": 0.001,
+            "momentum": 0.9
+        }
 	},
 	"predict": {
 		"model": "{workdir}/checkpoints/best.h5",
