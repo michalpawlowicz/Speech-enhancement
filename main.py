@@ -45,6 +45,7 @@ def config_preproces(config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     required = parser.add_argument_group('Required arguments')
+    optional = parser.add_argument_group('Required arguments')
     required.add_argument("--train", dest="train",
                           required=False, default=False, action="store_true", help="Start training")
     required.add_argument("--gen", dest="gen",
@@ -55,6 +56,8 @@ if __name__ == "__main__":
                           required=True, help="Use given config file")
     required.add_argument("--build-env", dest="build",
                           required=False, default=False, action='store_true', help="Build working dir")
+    optional.add_argument("--learning-rate", dest="lr", type=float,
+                          required=False, action='store', help="Learning rate")
     args = parser.parse_args()
 
     if len(list(filter(lambda x: x, [args.train, args.gen, args.pred, args.build]))) != 1:
@@ -66,6 +69,9 @@ if __name__ == "__main__":
     config = config_preproces(config)
 
     if args.train:
+        if args.lr is not None:
+            print("Overriding learning rate from config file with {}".format(args.lr))
+            config["train"]["optimizer"]["lr"] = args.lr
         args = {
             "workdir": config["workdir"],
             "logs": config["train"]["logs"],
@@ -74,8 +80,8 @@ if __name__ == "__main__":
             "batch_size": config["train"]["batch_size"],
             "input_size": (config["input_size"][0], config["input_size"][1], 1),
             "validate": config["train"]["validate"],
-            "optimizer" : config["train"]["optimizer"],
-            "loss" : config["train"]["loss"]
+            "optimizer": config["train"]["optimizer"],
+            "loss": config["train"]["loss"]
         }
         train_entry(**args)
     elif args.gen:
