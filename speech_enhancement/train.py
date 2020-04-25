@@ -64,7 +64,7 @@ def train_entry(**kwargs):
     
     model = unet(input_size=input_size, loss=loss, optimizer=optimizer["name"], lr=optimizer["lr"])
     model.fit_generator(train_generator, epochs=epochs, shuffle=False, callbacks=callbacks, verbose=1,
-                        workers=1, use_multiprocessing=False, validation_data=test_generator, validation_freq=1)
+                        workers=8, use_multiprocessing=True, validation_data=test_generator, validation_freq=1)
 
 
 class Generator(tf.keras.utils.Sequence):
