@@ -21,4 +21,4 @@ echo "Processing test-clean"
 move test-clean.tar.gz LibriSpeech/test-clean/
 
 wget https://github.com/karoldvl/ESC-50/archive/master.zip
-tar -xf master.zip && rm -r master.zip
+7z x master.zip
