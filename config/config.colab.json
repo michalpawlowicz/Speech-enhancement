@@ -1,36 +1,39 @@
 {
-	"frame_length" : 16384,
-	"sampling" : 16000,
+	"frame_length" : 8192,
+	"sampling" : 8000,
 	"workdir"  : "data/",
 	"n_fft" : 255,
-	"fft_hop_length" : 256,
+	"fft_hop_length" : 64,
 	"input_size": [128, 128],
 	"generate": {
-		"samplify_npy_size": 10000,
-        "overlap": 0.5,
+		"samplify_npy_size": 200000,
+        	"overlap": 0.5,
+		"scaler_path": "{workdir}/scaler.pkl",
 		"train": {
-			"input_noise" : "../ESC-50-master/audio",
-			"input_clean" : "../LibriSpeech/dev-clean/"
+			"input_noise" : "ESC-50-master/audio",
+			"input_clean" : "LibriSpeech/dev-clean/"
 		},
 		"test": {
-			"input_noise" : "../ESC-50-master/audio",
-			"input_clean" : "../LibriSpeech/test-clean"
+			"input_noise" : "ESC-50-master/audio",
+			"input_clean" : "LibriSpeech/test-clean"
 		}
 	},
 	"train": {
-		"checkpoints" : "{workdir}/checkpoints/",
-		"logs" : "logs/",
-		"epochs" : 40,
-		"batch_size" : 128,
+		"checkpoints" : "/content/colab/checkpoints/",
+		"logs" : "/content/colab/logs/",
+		"epochs" : 200,
+		"batch_size" : 512,
+		"shuffle" : true,
 		"validate": false,
-        	"loss": "mean_squared_error",
+        	"loss": "huber_loss",
         	"optimizer": {
             		"name": "adam",
-            		"lr": 0.001
+            		"lr": 0.0001
         	}
 	},
 	"predict": {
-		"model": "data/checkpoints/model-cp-epoch_0032.h5",
+		"scaler_path": "{workdir}/scaler.pkl",
+		"model": "data/checkpoints/model-cp-epoch_0037.h5",
 		"in_predict": ["samples/noisy-1.wav", "samples/noisy-2.wav", "samples/noisy-3.wav"],
 		"out_predict": ["samples/predicted-1.wav", "samples/predicted-2.wav", "samples/predicted-3.wav"]
 	}
