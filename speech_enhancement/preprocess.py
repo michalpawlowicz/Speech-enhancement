@@ -7,6 +7,7 @@ from typing import List
 from numpy import save
 import math
 from sklearn.preprocessing import MinMaxScaler
+import pickle
 
 
 def read_files(audio_files: List[str], sampling: int, frame_length: int, hop_length: int) -> np.ndarray:
@@ -46,14 +47,15 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
     Returns:
         int -- [Total number of generated samples]
     """
-    noice_files = list(os.scandir(noise_dir))[:10]
-    speech_files = list(os.scandir(speech_dir))
+    noice_files = list(os.scandir(noise_dir))[:100]
+    speech_files = list(os.scandir(speech_dir))[:500]
 
     random.shuffle(noice_files)
     random.shuffle(speech_files)
 
     print("Reading noise into memory")
-    noise_frames = read_files(noice_files, sampling, frame_length, int(frame_length * 0.3))
+    noise_frames = read_files(noice_files, sampling,
+                              frame_length, int(frame_length * 0.2))
 
     samples_count = 0
 
@@ -134,11 +136,40 @@ def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, f
                 sample, n_fft=n_fft, hop_length=fft_hop_length))
             spectrograms.append(librosa.amplitude_to_db(magnitude, ref=np.max))
             bar.next()
-        output = os.path.join(spectrogram_out, "{}.npy".format(idx))
-        print("\nWriting spectrograms to %s" % output)
 
         spectrograms = np.array(spectrograms)
-        spectrograms = (spectrograms - np.min(spectrograms)) / (np.max(spectrograms) - np.min(spectrograms))
 
+        output = os.path.join(spectrogram_out, "{}.npy".format(idx))
+        print("\nWriting spectrograms to %s" % output)
         save(output, np.array(spectrograms))
         bar.finish()
+
+
+def fit_scaler(samples_npy: List[str], scaler_save_path: str):
+    scaler = MinMaxScaler()
+    bar = Bar('Fitting scaler ..', max=len(samples_npy))
+    for samples_path in samples_npy:
+        samples = np.load(samples_path)
+        shape = samples.shape
+        scaler.partial_fit(samples.reshape(shape[0], -1))
+        bar.next()
+    bar.finish()
+    print("Saving scaler to %s" % scaler_save_path)
+    with open(scaler_save_path, 'wb+') as f:
+        pickle.dump(scaler, f)
+
+
+def scale_it(samples_npy: List[str], scaler_path: str):
+    with open(scaler_path, 'rb') as f:
+        scaler = pickle.load(f)
+    bar = Bar('Scaling ..', max=len(samples_npy))
+    for samples_path in samples_npy:
+        samples = np.load(samples_path)
+        shape = samples.shape
+        samples = samples.reshape(shape[0], -1)
+        samples = scaler.transform(samples).reshape(shape)
+        temp_output_file = samples_path.split('.')[0] + "_tmp.npy" 
+        save(temp_output_file, samples)
+        os.rename(temp_output_file, samples_path)
+        bar.next()
+    bar.finish()

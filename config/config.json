@@ -8,6 +8,7 @@
 	"generate": {
 		"samplify_npy_size": 200000,
         	"overlap": 0.5,
+		"scaler_path": "{workdir}/scaler.pkl",
 		"train": {
 			"input_noise" : "/home/michal/ESC-50/ESC-50-master/audio",
 			"input_clean" : "/home/michal/OpenSLR/LibriSpeech/dev-clean/"
@@ -20,7 +21,7 @@
 	"train": {
 		"checkpoints" : "{workdir}/checkpoints/",
 		"logs" : "logs/",
-		"epochs" : 40,
+		"epochs" : 80,
 		"batch_size" : 128,
 		"shuffle" : true,
 		"validate": false,
@@ -31,7 +32,8 @@
         	}
 	},
 	"predict": {
-		"model": "data/checkpoints/model-cp-epoch_0019.h5",
+		"scaler_path": "{workdir}/scaler.pkl",
+		"model": "data/checkpoints/model-cp-epoch_0037.h5",
 		"in_predict": ["samples/noisy-1.wav", "samples/noisy-2.wav", "samples/noisy-3.wav"],
 		"out_predict": ["samples/predicted-1.wav", "samples/predicted-2.wav", "samples/predicted-3.wav"]
 	}

@@ -94,7 +94,8 @@ if __name__ == "__main__":
             "fft_hop_length": config["fft_hop_length"],
             "samplify_npy_size": config["generate"]["samplify_npy_size"],
             "train": config["generate"]["train"],
-            "test": config["generate"]["test"]
+            "test": config["generate"]["test"],
+            "scaler_path": config["generate"]["scaler_path"] if "scaler_path" in config["generate"] else None
         }
         preprocess_data_entry(**args)
     elif args.pred:
@@ -105,7 +106,8 @@ if __name__ == "__main__":
             "fft_hop_length": config["fft_hop_length"],
             "model": config["predict"]["model"],
             "pred_in_audio": config["predict"]["in_predict"],
-            "pred_out_audio": config["predict"]["out_predict"]
+            "pred_out_audio": config["predict"]["out_predict"],
+            "scaler_path": config["generate"]["scaler_path"] if "scaler_path" in config["generate"] else None
         }
         predict_entry(**args)
     elif args.build:

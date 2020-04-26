@@ -1,8 +1,9 @@
-from speech_enhancement.preprocess import create, samplify, spectrogramplify
+from speech_enhancement.preprocess import create, samplify, spectrogramplify, fit_scaler, scale_it
 from sklearn.preprocessing import normalize
 from typing import Tuple
 import os
 import librosa
+from sklearn.preprocessing import MinMaxScaler
 
 
 def preprocess_data_entry(**kwargs):
@@ -39,11 +40,13 @@ def preprocess_data_entry(**kwargs):
     spectrogram_test_noisy = os.path.join(
         workdir, "Test", "spectrogram", "noisy")
 
+    scaler_path = kwargs["scaler_path"]
+
     train_samples_count = preprocess_data(kwargs["train"]["input_noise"], kwargs["train"]["input_clean"], train_noisy, train_clean, samplify_train_noisy,
-                                          samplify_train_clean, spectrogram_train_noisy, spectrogram_train_clean, frame_length, sampling, samplify_npy_size, n_fft, fft_hop_length)
+                                          samplify_train_clean, spectrogram_train_noisy, spectrogram_train_clean, frame_length, sampling, samplify_npy_size, n_fft, fft_hop_length, scaler_path, fit=True)
 
     test_samples_count = preprocess_data(kwargs["test"]["input_noise"], kwargs["test"]["input_clean"], test_noisy, test_clean, samplify_test_noisy,
-                                         samplify_test_clean, spectrogram_test_noisy, spectrogram_test_clean, frame_length, sampling, samplify_npy_size, n_fft, fft_hop_length)
+                                         samplify_test_clean, spectrogram_test_noisy, spectrogram_test_clean, frame_length, sampling, samplify_npy_size, n_fft, fft_hop_length, scaler_path, fit=False)
 
     return train_samples_count, test_samples_count
 
@@ -53,7 +56,7 @@ def preprocess_data(input_noise_dir: str, input_clean_dir: str,
                     samplify_noisy_dir: str, samplify_clean_dir: str,
                     spectrogramify_clean_dir: str, spectrogramify_noisy_dir: str,
                     frame_length: int, sampling: int, samplify_npy_size: int,
-                    n_fft: int, fft_hop_length: int) -> int:
+                    n_fft: int, fft_hop_length: int, scaler_path: str, fit: bool = False) -> int:
     """[summary]
 
     Arguments:
@@ -107,5 +110,14 @@ def preprocess_data(input_noise_dir: str, input_clean_dir: str,
                      spectrogramify_clean_dir, n_fft, fft_hop_length)
     spectrogramplify(samplifiy_noisy,
                      spectrogramify_noisy_dir, n_fft, fft_hop_length)
+
+    spectrogramify_clean = sorted(
+        map(lambda e: e.path, os.scandir(spectrogramify_clean_dir)))
+    spectrogramify_noisy = sorted(
+        map(lambda e: e.path, os.scandir(spectrogramify_noisy_dir)))
+
+    if fit_scaler:
+        fit_scaler(spectrogramify_clean + spectrogramify_noisy, scaler_path)
+    scale_it(spectrogramify_clean + spectrogramify_noisy, scaler_path)
 
     return samples_count
