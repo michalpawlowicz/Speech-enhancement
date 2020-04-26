@@ -19,8 +19,8 @@
 		}
 	},
 	"train": {
-		"checkpoints" : "/content/colab/checkpoints/",
-		"logs" : "/content/colab/logs/",
+		"checkpoints" : "/content/drive/My Drive/colab/checkpoints/",
+		"logs" : "/content/drive/My Drive/colab/logs/",
 		"epochs" : 200,
 		"batch_size" : 512,
 		"shuffle" : true,
