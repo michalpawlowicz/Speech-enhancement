@@ -47,8 +47,8 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
     Returns:
         int -- [Total number of generated samples]
     """
-    noice_files = list(os.scandir(noise_dir))[:100]
-    speech_files = list(os.scandir(speech_dir))[:500]
+    noice_files = list(os.scandir(noise_dir))
+    speech_files = list(os.scandir(speech_dir))
 
     random.shuffle(noice_files)
     random.shuffle(speech_files)
