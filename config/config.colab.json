@@ -10,12 +10,12 @@
         	"overlap": 0.5,
 		"scaler_path": "{workdir}/scaler.pkl",
 		"train": {
-			"input_noise" : "ESC-50-master/audio",
-			"input_clean" : "LibriSpeech/dev-clean/"
+			"input_noise" : "/content/ESC-50-master/audio",
+			"input_clean" : "/content/LibriSpeech/dev-clean/"
 		},
 		"test": {
-			"input_noise" : "ESC-50-master/audio",
-			"input_clean" : "LibriSpeech/test-clean"
+			"input_noise" : "/content/ESC-50-master/audio",
+			"input_clean" : "/content/LibriSpeech/test-clean"
 		}
 	},
 	"train": {
