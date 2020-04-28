@@ -21,7 +21,7 @@
 	"train": {
 		"checkpoints" : "{workdir}/checkpoints/",
 		"logs" : "logs/",
-		"epochs" : 80,
+		"epochs" : 100,
 		"batch_size" : 128,
 		"shuffle" : true,
 		"validate": false,
@@ -33,7 +33,7 @@
 	},
 	"predict": {
 		"scaler_path": "{workdir}/scaler.pkl",
-		"model": "data/checkpoints/model-cp-epoch_0037.h5",
+		"model": "data/checkpoints/model-cp-epoch_0100.h5",
 		"in_predict": ["samples/noisy-1.wav", "samples/noisy-2.wav", "samples/noisy-3.wav"],
 		"out_predict": ["samples/predicted-1.wav", "samples/predicted-2.wav", "samples/predicted-3.wav"]
 	}

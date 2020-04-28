@@ -28,41 +28,42 @@ def predict_entry(**kwargs):
     config.gpu_options.allow_growth = True
     _ = tf.Session(config=config)
 
-    with open(scaler_path, 'rb') as f: scaler = pickle.load(f)
+    with open(scaler_path, 'rb') as f:
+        scaler = pickle.load(f)
 
     for in_audio_path, out_audio_path in zip(in_audio_path_v, out_audio_path_v):
-        audio_y, _ = librosa.load(in_audio_path, sr=sampling)
-        frames = librosa.util.frame(
-            audio_y, frame_length=frame_length, hop_length=frame_length, axis=0)
+        y, _ = librosa.load(in_audio_path, sr=sampling)
+        audio_frames = librosa.util.frame(
+            y, frame_length=frame_length, hop_length=frame_length, axis=0)
 
-        audio_y = frames.reshape(1, -1)
-
-        X = []
+        X_spectrograms_prenormalized = []
+        X_spectrograms = []
         phases = []
-        for i in range(frames.shape[0]):
+        for i in range(audio_frames.shape[0]):
             magnitude, phase = librosa.magphase(librosa.stft(
-                np.asfortranarray(frames[i]), n_fft=n_fft, hop_length=fft_hop_length))
+                np.asfortranarray(audio_frames[i]), n_fft=n_fft, hop_length=fft_hop_length))
             spectrogram = librosa.amplitude_to_db(magnitude, ref=np.max)
+            X_spectrograms_prenormalized.append(spectrogram)
             shape = spectrogram.shape
-            spectrogram = scaler.transform(spectrogram.reshape(1, -1)).reshape(shape)
-            X.append(spectrogram)
+            spectrogram = scaler.transform(
+                spectrogram.reshape(1, -1)).reshape(shape)
+            X_spectrograms.append(spectrogram)
             phases.append(phase)
 
-        X = np.array(X)
-        X = X.reshape(X.shape[0], X.shape[1], X.shape[2], 1)
+        X_spectrograms_prenormalized = np.array(X_spectrograms_prenormalized)
+        X_spectrograms = np.array(X_spectrograms)
+        X_spectrograms = X_spectrograms.reshape(
+            X_spectrograms.shape[0], X_spectrograms.shape[1], X_spectrograms.shape[2], 1)
 
         model = tf.keras.models.load_model(model_path)
-        Y = model.predict(X)[:, :, :, 0]
+        Y = model.predict(X_spectrograms)[:, :, :, 0]
+
+        for i, y in enumerate(Y):
+            Y[i:] = scaler.inverse_transform(y.reshape(1, -1)).reshape(shape)
 
         audio = np.zeros((Y.shape[0], frame_length))
-        for i, (y, p) in enumerate(zip(Y, phases)):
-            shape = y.shape
-            y = scaler.inverse_transform(y.reshape(1, -1)).reshape(shape)
+        for i, (x, y, p) in enumerate(zip(X_spectrograms_prenormalized, Y, phases)):
             audio[i, :] = magnitude_db_and_phase_to_audio(
-                frame_length, fft_hop_length, y, p)
+                frame_length, fft_hop_length, y - x, p)
 
-        audio_1 = audio.reshape(1, -1)
-        audio_2 = audio_y[0] - audio_1[0]
-
-        librosa.output.write_wav(out_audio_path.split('.')[0] + "_1.wav", audio_1[0], sampling, norm=True)
-        librosa.output.write_wav(out_audio_path.split('.')[0] + "_2.wav", audio_2, sampling, norm=True)
+        librosa.output.write_wav(out_audio_path, audio.reshape(1, -1)[0], sampling, norm=True)
