@@ -33,7 +33,7 @@ def read_files(audio_files: List[str], sampling: int, frame_length: int, hop_len
     return np.vstack(audio_stacks)
 
 
-def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, frame_length: int, sampling: int) -> int:
+def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, frame_length: int, sampling: int, speech_frame_hop: float = 0.2, noise_frame_hop: float = 0.2) -> int:
     """[summary]
 
     Arguments:
@@ -55,7 +55,7 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
 
     print("Reading noise into memory")
     noise_frames = read_files(noice_files, sampling,
-                              frame_length, int(frame_length * 0.2))
+                              frame_length, int(frame_length * speech_frame_hop))
 
     samples_count = 0
 
@@ -63,7 +63,7 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
     for sample_file in speech_files:
         y, _ = librosa.load(sample_file, sr=sampling)
         y = librosa.util.frame(y, frame_length=frame_length,
-                               hop_length=frame_length, axis=0)
+                               hop_length=int(frame_length * noise_frame_hop), axis=0)
         samples_count += y.shape[0]
         filename = os.path.splitext(os.path.basename(sample_file))[0] + ".wav"
         librosa.output.write_wav(os.path.join(
@@ -168,7 +168,7 @@ def scale_it(samples_npy: List[str], scaler_path: str):
         shape = samples.shape
         samples = samples.reshape(shape[0], -1)
         samples = scaler.transform(samples).reshape(shape)
-        temp_output_file = samples_path.split('.')[0] + "_tmp.npy" 
+        temp_output_file = samples_path.split('.')[0] + "_tmp.npy"
         save(temp_output_file, samples)
         os.rename(temp_output_file, samples_path)
         bar.next()
