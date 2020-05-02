@@ -1,4 +1,4 @@
-from speech_enhancement.preprocess import create, samplify, spectrogramplify, fit_scaler, scale_it
+from speech_enhancement.preprocess import create, samplify, spectrogramplify, fit_scaler, scale_it, shuffle
 from sklearn.preprocessing import normalize
 from typing import Tuple
 import os
@@ -105,6 +105,8 @@ def preprocess_data(input_noise_dir: str, input_clean_dir: str,
         map(lambda entry: entry.path, os.scandir(samplify_clean_dir)))
     samplifiy_noisy = sorted(
         map(lambda entry: entry.path, os.scandir(samplify_noisy_dir)))
+
+    shuffle(samplifiy_noisy, samplifiy_clean)
 
     spectrogramplify(samplifiy_clean,
                      spectrogramify_clean_dir, n_fft, fft_hop_length)

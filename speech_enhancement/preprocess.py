@@ -144,6 +144,20 @@ def spectrogramplify(samples_npy: List[str], spectrogram_out: str, n_fft: int, f
         save(output, np.array(spectrograms))
         bar.finish()
 
+def shuffle(x_samples_npy: List[str], y_samples_npy: List[str]):
+    print("Shuffling denerated npy files")
+    for x_npy, y_npy in zip(x_samples_npy, y_samples_npy):
+        x = np.load(x_npy)
+        y = np.load(y_npy)
+        if len(x) != len(y):
+            raise RuntimeError("Samle sets are of different sizes")
+        indexes = list(range(0, len(x)))
+        random.shuffle(indexes)
+        for i, j in enumerate(indexes):
+            x[i], x[j] = x[j], x[i]
+            y[i], y[j] = y[j], y[i]
+        save(x_npy, x)
+        save(y_npy, y)
 
 def fit_scaler(samples_npy: List[str], scaler_save_path: str):
     scaler = MinMaxScaler()
