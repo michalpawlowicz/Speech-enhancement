@@ -69,7 +69,7 @@ def create(noise_dir: str, speech_dir: str, noisy_dir: str, clean_dir: str, fram
         librosa.output.write_wav(os.path.join(
             clean_dir, filename), y.reshape(1, -1)[0], sr=sampling)
         indexes = np.random.randint(0, noise_frames.shape[0], y.shape[0])
-        magnitutes = np.random.uniform(.2, .6, y.shape[0])
+        magnitutes = np.random.uniform(.1, .5, y.shape[0])
         for i, index in enumerate(indexes):
             y[i, :] = y[i, :] + magnitutes[i] * noise_frames[index, :]
         librosa.output.write_wav(os.path.join(

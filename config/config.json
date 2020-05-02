@@ -1,6 +1,6 @@
 {
-	"frame_length" : 16384,
-	"sampling" : 16000,
+	"frame_length" : 8192,
+	"sampling" : 8192,
 	"workdir"  : "data/",
 	"n_fft" : 255,
 	"fft_hop_length" : 128,
